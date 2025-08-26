@@ -45,6 +45,18 @@ setCatchHandler(async ({ event }) => {
   return Response.error();
 });
 
+// Share target endpoint: keep it available quickly
+registerRoute(
+  ({ url, request }) => request.method === 'GET' && url.pathname === '/share',
+  new NetworkFirst({ cacheName: 'share-target' })
+);
+
+// File handlers endpoint: GET landing page and POST form-data routing
+registerRoute(
+  ({ url, request }) => request.method === 'GET' && url.pathname === '/open-file',
+  new NetworkFirst({ cacheName: 'file-handler' })
+);
+
 // Static assets: images
 registerRoute(
   ({ request }) => request.destination === 'image',

@@ -14,7 +14,7 @@ export default function ServiceCard({ title, icon, color='primary', active=false
       }}
     >
       <CardActionArea onClick={onClick} sx={{ p: 0 }}>
-        <Box className="flip" sx={{ position:'relative', transition:'transform 500ms cubic-bezier(0.4, 0, 0.2, 1)', transformStyle:'preserve-3d', p: 3, minHeight: 140 }}>
+        <Box className="flip" sx={{ position:'relative', transition:'transform 500ms cubic-bezier(0.4, 0, 0.2, 1)', transformStyle:'preserve-3d', p: { xs: 2, sm: 3 }, minHeight: { xs: 110, sm: 140 } }}>
           {/* Front */}
           <Box sx={{ 
             position:'absolute', 
@@ -39,7 +39,7 @@ export default function ServiceCard({ title, icon, color='primary', active=false
             ) : (
               <Box sx={{ 
                 '& svg': { 
-                  fontSize: 72, 
+                  fontSize: { xs: 48, sm: 60, md: 72 }, 
                   color: (t) => t.palette.mode === 'dark' ? '#ffffff' : t.palette.primary.main 
                 } 
               }}>

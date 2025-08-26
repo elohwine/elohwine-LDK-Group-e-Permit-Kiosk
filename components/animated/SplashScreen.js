@@ -60,7 +60,8 @@ export default function SplashScreen({ onDone, autoHideMs = 2200 }){
       role="dialog" aria-modal="true" aria-label="Loading"
     >
       <Box sx={{ textAlign:'center', position:'relative' }}>
-  <BrandWatermark center maxSize={280} opacity={0.2} paths={["/icons/icon-512.png","/icons/icon-192.png","/reference.png","/img/logo.png","/img/logo.svg","/img/logo.jpg"]} />
+        {/* Centered brand watermark using the primary logo */}
+        <BrandWatermark center maxSize={280} opacity={0.25} paths={["/img/logo.png","/img/logo.svg","/img/logo.jpg","/icons/icon-512.png","/icons/icon-192.png","/reference.png"]} />
         <Box sx={{ width: 220, height: 220, mx:'auto', mb: 2, position:'relative' }}>
           {anim ? (
             <Lottie autoplay={!reduceMotion} loop={!reduceMotion} animationData={anim} style={{ width:'100%', height:'100%' }} />
@@ -71,6 +72,13 @@ export default function SplashScreen({ onDone, autoHideMs = 2200 }){
               boxShadow:(t)=>`0 0 40px ${t.palette.primary.main}66`
             }}/>
           )}
+          {/* Always show the brand logo in the center of the loader */}
+          <Box sx={{ position:'absolute', inset:0, display:'grid', placeItems:'center' }}>
+            <Box sx={{ width: 96, height: 96, borderRadius: '20%', bgcolor:'transparent',
+              backgroundImage: 'url(/img/logo.png)', backgroundRepeat:'no-repeat', backgroundPosition:'center', backgroundSize:'contain',
+              filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.25))'
+            }}/>
+          </Box>
           <Box sx={{ position:'absolute', inset:-12, filter:'blur(24px)', opacity:0.4, borderRadius:'50%', background:(t)=>t.palette.primary.main }} />
         </Box>
         <Typography variant="h4" sx={{ fontWeight:800, letterSpacing:1.5, mb: 0.5 }}>e‑Permit</Typography>

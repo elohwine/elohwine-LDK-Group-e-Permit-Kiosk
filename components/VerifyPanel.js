@@ -45,7 +45,7 @@ export default function VerifyPanel({ embedded = false }){
   }
 
   return (
-  <Paper elevation={embedded ? 8 : 10} sx={{ p:3, pb: 'calc(var(--kbd-inset, 0px) + 40px)', borderRadius:3, bgcolor:'background.paper' }}>
+  <Paper elevation={embedded ? 8 : 10} sx={{ p: { xs: 2, sm: 3 }, pb: 'calc(var(--kbd-inset, 0px) + 48px)', borderRadius:3, bgcolor:'background.paper' }}>
       <Box sx={{ display:'flex', alignItems:'center', gap:1, mb:1 }}>
         <FactCheckIcon color="error"/>
         <Typography variant="h5" color="error.main">Verify</Typography>

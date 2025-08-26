@@ -54,16 +54,16 @@ export default function Home() {
   ];
 
   return (
-  <Box sx={{ height:'100vh', display:'flex', flexDirection:'column', minHeight: 0, overflow: 'hidden' }}>
+  <Box sx={{ height: { xs: '100dvh', md: '100vh' }, minHeight: '100svh', display:'flex', flexDirection:'column', overflow: 'hidden' }}>
       {showSplash && (
         <SplashScreen autoHideMs={4500} onDone={()=>{ try { sessionStorage.setItem('splashSeen','1'); } catch {} ; setShowSplash(false); }} />
       )}
       {showOnboarding && (
         <OnboardingCarousel open onDone={()=>{ setShowOnboarding(false); try { localStorage.setItem('onboardingSeen','1'); } catch {} }} />
       )}
-      <TopBar/>
-  <Box sx={{ px:3, pb:3, flex:1, display: 'flex', flexDirection: 'column', minHeight: 0, overflowY:'auto' }}>
-        <Grid container spacing={3} sx={{ flex:1, minHeight: 0 }}>
+  <TopBar/>
+  <Box sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 }, flex:1, display: 'flex', flexDirection: 'column', minHeight: 0, overflowY:'auto' }}>
+    <Grid container spacing={{ xs: 2, md: 3 }} sx={{ flex:1, minHeight: 0 }}>
           {/* Left: Services cards */}
           <Grid item xs={12} md={5} sx={{ display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6" sx={{ mb:2, color:'text.secondary', flexShrink: 0 }}>Services</Typography>

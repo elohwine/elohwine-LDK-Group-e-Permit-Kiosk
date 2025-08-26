@@ -57,13 +57,13 @@ export default function ServiceForms() {
   }
 
   return (
-  <Paper elevation={12} sx={{ position:'relative', overflow:'hidden', p: 3, pb: 'calc(var(--kbd-inset, 0px) + 48px)', borderRadius: 3, bgcolor: 'background.paper' }}>
+  <Paper elevation={12} sx={{ position:'relative', overflow:'hidden', p: { xs: 2, sm: 3 }, pb: 'calc(var(--kbd-inset, 0px) + 56px)', borderRadius: 3, bgcolor: 'background.paper' }}>
       <Box sx={{ display:'flex', alignItems:'center', gap:1, mb:1 }}>
         <QrCode2Icon color="primary"/>
         <Typography variant="h5">Virtual e‑Permits</Typography>
       </Box>
   <Divider sx={{ mb:2, opacity:0.1 }}/>
-  <Box component="form" onSubmit={onSubmit} sx={{ maxWidth: 880 }}>
+  <Box component="form" onSubmit={onSubmit} sx={{ maxWidth: { xs: '100%', md: 880 } }}>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} md={8}>
             <TextField fullWidth label="Vehicle Registration (VRM)" value={vrm} onChange={e=>setVrm(e.target.value)} required/>
@@ -75,8 +75,8 @@ export default function ServiceForms() {
             <TextField fullWidth label="Email (optional for reminder notifications)" type="email" value={email} onChange={e=>setEmail(e.target.value)}/>
           </Grid>
           <Grid item xs={12} md={12}>
-            <Box sx={{ display:'flex', gap:2, flexWrap:'wrap', pt: 1, alignItems:'center' }}>
-              <Button type="submit" variant="contained" size="large" disabled={loading}>
+            <Box sx={{ display:'flex', gap:2, flexWrap:'wrap', pt: 1, alignItems:'stretch' }}>
+              <Button fullWidth sx={{ maxWidth: { sm: 240 } }} type="submit" variant="contained" size="large" disabled={loading}>
                 {loading ? (
                   <Box sx={{ display:'flex', alignItems:'center', gap:1 }}>
                     <CircularProgress size={18} color="inherit"/>
@@ -84,7 +84,7 @@ export default function ServiceForms() {
                   </Box>
                 ) : 'Issue Permit'}
               </Button>
-              <Button variant="outlined" href="/verify" size="large">Verify</Button>
+              <Button fullWidth sx={{ maxWidth: { sm: 200 } }} variant="outlined" href="/verify" size="large">Verify</Button>
             </Box>
           </Grid>
         </Grid>
