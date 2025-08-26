@@ -1,0 +1,12 @@
+html, body, #__next { height: 100%; }
+body { margin: 0; }
+
+/* When on-screen keyboard is open, add bottom inset to avoid overlap */
+body.kbd-open #__next {
+	padding-bottom: var(--kbd-inset, 0);
+}
+
+/* Ensure the app wrapper can scroll when the keyboard takes space */
+body, #__next {
+	overflow: hidden;
+}

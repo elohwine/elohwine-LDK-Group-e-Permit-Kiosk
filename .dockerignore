@@ -1,0 +1,34 @@
+# Ignore Docker-related files
+Dockerfile
+.dockerignore
+
+# Ignore Next.js build artifacts and local environment files
+.next/
+.vercel/
+out/
+build/
+
+# Ignore node_modules
+node_modules/
+
+# Ignore local environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignore logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Ignore IDE/editor specific files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
