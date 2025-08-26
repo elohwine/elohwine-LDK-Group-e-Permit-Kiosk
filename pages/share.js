@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Tooltip } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 export default function SharePage(){
   const [data, setData] = useState({ title: '', text: '', url: '' });
-  useEffect(()=>{
+  React.useEffect(()=>{
     if (typeof window === 'undefined' || !('launchQueue' in window)) return;
     window.launchQueue.setConsumer(async (launchParams) => {
       const formData = launchParams?.files ? null : null;
@@ -27,25 +27,5 @@ export default function SharePage(){
         <div><b>URL:</b> {data.url || '—'}</div>
       </Box>
     </Box>
-  );
-}
-import { useEffect, useState } from 'react';
-
-export default function ShareTarget() {
-  const [data, setData] = useState(null);
-  useEffect(() => {
-    try {
-      const url = new URL(window.location.href);
-      const title = url.searchParams.get('title') || '';
-      const text = url.searchParams.get('text') || '';
-      const link = url.searchParams.get('url') || '';
-      setData({ title, text, url: link });
-    } catch {}
-  }, []);
-  return (
-    <main style={{ padding: 16 }}>
-      <h1>Share Target</h1>
-      <pre aria-label="shared-data">{JSON.stringify(data, null, 2)}</pre>
-    </main>
   );
 }
