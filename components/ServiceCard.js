@@ -6,7 +6,10 @@ export default function ServiceCard({ title, icon, color='primary', active=false
       elevation={active ? 16 : 4}
       sx={{
         borderRadius: 3,
-        boxShadow: active ? '0 16px 40px rgba(0,0,0,0.4)' : undefined,
+        boxShadow: active ? '0 16px 40px rgba(0,0,0,0.35)' : undefined,
+        position: 'relative',
+        isolation: 'isolate',
+        '&:hover': { zIndex: 2 },
         transformStyle: 'preserve-3d',
         perspective: 1000,
         cursor: 'pointer',
@@ -23,12 +26,13 @@ export default function ServiceCard({ title, icon, color='primary', active=false
             placeItems:'center', 
             backfaceVisibility:'hidden', 
             borderRadius: 3, 
-            bgcolor: active ? 'error.main' : (t)=>`${t.palette.primary.main}4D`, 
+            bgcolor: active ? 'error.main' : (t)=>`${t.palette.primary.main}26`, 
             color: active ? '#ffffff' : (t)=>t.palette.mode === 'dark' ? t.palette.primary.contrastText : t.palette.primary.main,
-            '&:hover': (t) => ({
+            transition: 'background 200ms ease, box-shadow 200ms ease',
+            '&:hover': (t) => active ? {} : ({
               background: t.palette.mode === 'dark' 
-                ? `linear-gradient(135deg, ${t.palette.primary.main}33, ${t.palette.error.main}33)`
-                : `linear-gradient(135deg, ${t.palette.primary.main}26, ${t.palette.primary.main}40)`
+                ? `linear-gradient(135deg, ${t.palette.primary.main}33, ${t.palette.primary.dark}40)`
+                : `linear-gradient(135deg, ${t.palette.primary.light}26, ${t.palette.primary.main}3d)`
             })
           }}>
             {active ? (
@@ -56,14 +60,15 @@ export default function ServiceCard({ title, icon, color='primary', active=false
             backfaceVisibility:'hidden', 
             transform: 'rotateY(180deg)', 
             borderRadius: 3, 
-            bgcolor: (t)=>`${t.palette.primary.main}4D`, 
+            bgcolor: (t)=>`${t.palette.primary.main}26`, 
             color:'#fff', 
             px:2, 
             textAlign:'center',
+            transition: 'background 200ms ease',
             '&:hover': (t) => ({
               background: t.palette.mode === 'dark' 
-                ? `linear-gradient(135deg, ${t.palette.primary.main}33, ${t.palette.error.main}33)`
-                : `linear-gradient(135deg, ${t.palette.primary.main}26, ${t.palette.primary.main}40)`
+                ? `linear-gradient(135deg, ${t.palette.primary.main}33, ${t.palette.primary.dark}40)`
+                : `linear-gradient(135deg, ${t.palette.primary.light}26, ${t.palette.primary.main}3d)`
             })
           }}>
             <Typography variant="subtitle1" sx={{ fontWeight:700 }}>{title}</Typography>

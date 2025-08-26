@@ -9,6 +9,12 @@
 /.next/
 /out/
 
+# Next.js generated service worker (when using next-pwa)
+/public/sw.js
+/public/workbox-*.js
+/public/workbox-*.js.map
+/public/worker-*.js
+
 # Production build
 /build
 
@@ -18,7 +24,30 @@ out/
 
 # Miscellaneous
 .DS_Store
+._*
+.Spotlight-V100
+.Trashes
+*.Thumbs.db
 *.pem
+*.pid
+*.seed
+*.pid.lock
+*.log
+*.log.*
+
+# OS files
+Desktop.ini
+Icon\r
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+*.swp
+*.swo
+*.swn
+*.swm
+*.DS_Store
 
 # Log files
 npm-debug.log*
@@ -37,6 +66,8 @@ lerna-debug.log*
 # IDE/Editor directories
 .vscode/
 .idea/
+.history/
+.fleet/
 *.suo
 *.ntvs*
 *.njsproj
@@ -50,9 +81,13 @@ lerna-debug.log*
 
 # Browser-based test runner files
 .jest_cache
+jest-html-reporters-*.html
 
 # Output of 'npm pack'
 *.tgz
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 # System files
 Thumbs.db
@@ -62,6 +97,11 @@ ehthumbs_vista.db
 # Optional: Docker-related files if you manage them separately
 # Dockerfile
 # .dockerignore
+
+# Image optimization caches
+.cache/
+.next/cache/
+**/.cache/
 
 # Android / TWA build artifacts
 *.apk
@@ -91,5 +131,22 @@ local.properties
 twa/.gradle/
 twa/build/
 
+# Generated icons and assets (source logo is tracked; generated outputs ignored)
+/public/icons/icon-192.png
+/public/icons/icon-512.png
+/public/icons/icon-192-maskable.png
+/public/icons/icon-512-maskable.png
+
 # Misc mobile outputs
 *.map
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+*.tmp.*
+*.temp.*
+
+# Mac/Linux junk
+.Trash-*/
+lost+found/
