@@ -60,8 +60,8 @@
   "categories": ["business", "utilities", "productivity"],
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
     { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
     { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "screenshots": [
@@ -87,7 +87,9 @@
       "description": "Start a new permit application",
       "url": "/apply",
       "icons": [
-        { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }
+  { "src": "/icons/shortcut-96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },
+  { "src": "/icons/shortcut-96-mono.png", "sizes": "96x96", "type": "image/png", "purpose": "monochrome" },
+  { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }
       ]
     },
     {
@@ -96,7 +98,9 @@
       "description": "Renew an existing permit",
       "url": "/renew",
       "icons": [
-        { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }
+  { "src": "/icons/shortcut-96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },
+  { "src": "/icons/shortcut-96-mono.png", "sizes": "96x96", "type": "image/png", "purpose": "monochrome" },
+  { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }
       ]
     },
     {
@@ -105,7 +109,9 @@
       "description": "Scan or enter a permit to verify",
       "url": "/verify",
       "icons": [
-        { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }
+  { "src": "/icons/shortcut-96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },
+  { "src": "/icons/shortcut-96-mono.png", "sizes": "96x96", "type": "image/png", "purpose": "monochrome" },
+  { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }
       ]
     }
   ],
