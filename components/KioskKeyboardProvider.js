@@ -77,16 +77,25 @@ export default function KioskKeyboardProvider(){
   setOpen(true);
     };
     const onFocusOut = (ev) => {
-      const el = ev.relatedTarget || document.activeElement;
-      if (!el) { setOpen(false); return; }
-      const tag = el.tagName;
-      const isEditable = tag === 'INPUT' || tag === 'TEXTAREA' || el.isContentEditable;
-      if (!isEditable) setOpen(false);
+      // Use a small delay to check if focus moved to keyboard buttons
+      setTimeout(() => {
+        const el = ev.relatedTarget || document.activeElement;
+        if (!el) { setOpen(false); return; }
+        
+        // Check if focus moved to keyboard or its buttons
+        const isKeyboardElement = el.closest('[data-keyboard-element]') || 
+                                  el.closest('.MuiPaper-root') && el.closest('[role="button"]');
+        if (isKeyboardElement) return; // Don't close if focus is on keyboard
+        
+        const tag = el.tagName;
+        const isEditable = tag === 'INPUT' || tag === 'TEXTAREA' || el.isContentEditable;
+        if (!isEditable) setOpen(false);
+      }, 50);
     };
     document.addEventListener('focusin', handler);
     document.addEventListener('focusout', onFocusOut);
     const onKeyDown = (e) => {
-      if (!open) return;
+      // Check keyboard open state directly to avoid stale closure
       if (e.key === 'Enter' && !e.isComposing) {
         // Close keyboard and blur target; allow form submit to proceed
         setOpen(false);
@@ -99,7 +108,7 @@ export default function KioskKeyboardProvider(){
       document.removeEventListener('focusout', onFocusOut);
       document.removeEventListener('keydown', onKeyDown);
     };
-  },[]);
+  },[open]);
 
   const handleChange = (v) => {
     setValue(v);

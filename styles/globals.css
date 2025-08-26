@@ -2,11 +2,21 @@ html, body, #__next { height: 100%; }
 body { margin: 0; }
 
 /* When on-screen keyboard is open, add bottom inset to avoid overlap */
-body.kbd-open #__next {
-	padding-bottom: var(--kbd-inset, 0);
-}
+body.kbd-open #__next { padding-bottom: calc(var(--kbd-inset, 0px) + env(safe-area-inset-bottom)); }
 
 /* Ensure the app wrapper can scroll when the keyboard takes space */
-body, #__next {
-	overflow: hidden;
+/* Let pages manage overflow; containers handle their own scroll */
+#__next { overflow: hidden; }
+
+/* Improve motion & scrolling */
+html { scroll-behavior: smooth; }
+
+/* Prevent accidental text selection on heavy-touch kiosk interactions */
+* { -webkit-tap-highlight-color: transparent; }
+
+/* Accessible focus outline */
+:where(button, [role="button"], a, input, textarea, select, .Mui-focusVisible):focus-visible {
+	outline: 3px solid #1374bc;
+	outline-offset: 2px;
+	border-radius: 8px;
 }

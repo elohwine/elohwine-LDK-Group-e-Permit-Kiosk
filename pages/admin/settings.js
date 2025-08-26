@@ -20,8 +20,8 @@ export default function Settings() {
   }
 
   return (
-    <Box sx={{ p:3 }}>
-      <Paper elevation={10} sx={{ p:3, borderRadius:3 }}>
+    <Box sx={{ p:3, height: '100%', display:'flex', flexDirection:'column', minHeight: 0, overflow:'hidden' }}>
+      <Paper elevation={10} sx={{ p:3, pb: 'calc(var(--kbd-inset, 0px) + 48px)', borderRadius:3, maxWidth: 1080, mx: 'auto', width: '100%', bgcolor:'background.paper', overflow:'auto' }}>
         <Typography variant="h5" sx={{ mb:2 }}>Admin Settings</Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
@@ -50,7 +50,7 @@ export default function Settings() {
             <FormControlLabel control={<Switch checked={!!s.kioskKeyboardAutoOpen} onChange={e=>updateField("kioskKeyboardAutoOpen", e.target.checked)} />} label="Auto‑open on focus" />
           </Grid>
         </Grid>
-        <Box sx={{ mt:2, display:'flex', gap:2 }}>
+  <Box sx={{ mt:2, display:'flex', gap:2, flexWrap:'wrap' }}>
           <Button variant="contained" onClick={onSave}>Save</Button>
           {saved && <Alert severity="success">Saved</Alert>}
         </Box>

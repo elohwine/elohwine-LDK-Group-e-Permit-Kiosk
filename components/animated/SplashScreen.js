@@ -22,14 +22,11 @@ function useLottie(url){
   return data;
 }
 
-export default function SplashScreen({ onDone, autoHideMs = 2200, lottiePath = '/lottie/Loading.json' }){
+export default function SplashScreen({ onDone, autoHideMs = 2200 }){
   const [show, setShow] = useState(true);
   const [reduceMotion, setReduceMotion] = useState(false);
   const doneRef = useRef(false);
-  const primary = useLottie(lottiePath);
-  const fallback1 = useLottie('/lottie/loading.json');
-  const fallback2 = useLottie('/lottie/success.json');
-  const anim = primary || fallback1 || fallback2;
+  const anim = useLottie('/lottie/Loading.json');
 
   useEffect(()=>{
     try {
@@ -63,7 +60,7 @@ export default function SplashScreen({ onDone, autoHideMs = 2200, lottiePath = '
       role="dialog" aria-modal="true" aria-label="Loading"
     >
       <Box sx={{ textAlign:'center', position:'relative' }}>
-        <BrandWatermark center maxSize={280} opacity={0.2} />
+  <BrandWatermark center maxSize={280} opacity={0.2} paths={["/img/logo.png","/img/logo.svg","/img/logo.jpg"]} />
         <Box sx={{ width: 220, height: 220, mx:'auto', mb: 2, position:'relative' }}>
           {anim ? (
             <Lottie autoplay={!reduceMotion} loop={!reduceMotion} animationData={anim} style={{ width:'100%', height:'100%' }} />

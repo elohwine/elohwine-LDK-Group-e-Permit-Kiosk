@@ -1,20 +1,90 @@
 {
   "name": "Kiosk ePermit",
   "short_name": "ePermit",
-  "start_url": "/",
+  "description": "Kiosk-friendly e‑Permit application for applying, renewing, and verifying parking permits with offline support and PWA install.",
+  "id": "com.kiosk.epermit",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "lang": "en-GB",
   "display": "standalone",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "portrait-primary",
+  "dir": "ltr",
   "background_color": "#ffffff",
   "theme_color": "#1374bc",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+epermit",
+      "url": "/protocol-handler?url=%s"
+    }
+  ],
+  "categories": ["business", "utilities", "productivity"],
   "icons": [
     {
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+  "type": "image/png",
+  "purpose": "any"
     },
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+  "type": "image/png",
+  "purpose": "any maskable"
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "/reference.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "Home screen",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Apply for Permit",
+      "short_name": "Apply",
+      "description": "Start a new permit application",
+      "url": "/apply",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Renew Permit",
+      "short_name": "Renew",
+      "description": "Renew an existing permit",
+      "url": "/renew",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Verify Permit",
+      "short_name": "Verify",
+      "description": "Scan or enter a permit to verify",
+      "url": "/verify",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
 }

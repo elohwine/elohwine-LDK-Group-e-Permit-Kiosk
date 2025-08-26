@@ -45,16 +45,16 @@ export default function VerifyPanel({ embedded = false }){
   }
 
   return (
-  <Paper elevation={embedded ? 8 : 10} sx={{ p:3, pb: 'calc(var(--kbd-inset, 0px) + 32px)', borderRadius:3 }}>
+  <Paper elevation={embedded ? 8 : 10} sx={{ p:3, pb: 'calc(var(--kbd-inset, 0px) + 40px)', borderRadius:3, bgcolor:'background.paper' }}>
       <Box sx={{ display:'flex', alignItems:'center', gap:1, mb:1 }}>
         <FactCheckIcon color="error"/>
         <Typography variant="h5" color="error.main">Verify</Typography>
       </Box>
       {!embedded && <Typography variant="body2" sx={{ color:'text.secondary', mb:2 }}>Check a permit by ID, VRM, or QR.</Typography>}
       <Divider sx={{ mb:2, opacity:0.1 }}/>
-      <Box sx={{ display:"flex", gap:2, mb:2 }}>
-        <Button variant={mode==="id"?"contained":"outlined"} onClick={()=>setMode("id")}>Permit ID</Button>
-        <Button variant={mode==="vrm"?"contained":"outlined"} onClick={()=>setMode("vrm")}>VRM Lookup</Button>
+      <Box sx={{ display:"flex", gap:2, mb:2, flexWrap:'wrap' }}>
+        <Button size="large" variant={mode==="id"?"contained":"outlined"} onClick={()=>setMode("id")}>Permit ID</Button>
+        <Button size="large" variant={mode==="vrm"?"contained":"outlined"} onClick={()=>setMode("vrm")}>VRM Lookup</Button>
       </Box>
       {mode==="id" && (
         <Grid container spacing={2} alignItems="center" sx={{ mb:2 }}>
@@ -62,7 +62,7 @@ export default function VerifyPanel({ embedded = false }){
             <TextField fullWidth label="Permit ID" value={id} onChange={e=>setId(e.target.value)} />
           </Grid>
           <Grid item xs={12} md={4}>
-            <Button fullWidth variant="contained" onClick={manualLookup}>Lookup</Button>
+            <Button fullWidth size="large" variant="contained" onClick={manualLookup}>Lookup</Button>
           </Grid>
         </Grid>
       )}
@@ -72,7 +72,7 @@ export default function VerifyPanel({ embedded = false }){
             <TextField fullWidth label="VRM" value={vrm} onChange={e=>setVrm(e.target.value)} />
           </Grid>
           <Grid item xs={12} md={4}>
-            <Button fullWidth variant="contained" onClick={manualLookup}>Search</Button>
+            <Button fullWidth size="large" variant="contained" onClick={manualLookup}>Search</Button>
           </Grid>
         </Grid>
       )}

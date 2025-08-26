@@ -54,7 +54,7 @@ export default function Home() {
   ];
 
   return (
-    <Box sx={{ height:'100%', display:'flex', flexDirection:'column' }}>
+  <Box sx={{ height:'100vh', display:'flex', flexDirection:'column', minHeight: 0, overflow: 'hidden' }}>
       {showSplash && (
         <SplashScreen autoHideMs={4500} onDone={()=>{ try { sessionStorage.setItem('splashSeen','1'); } catch {} ; setShowSplash(false); }} />
       )}
@@ -62,7 +62,7 @@ export default function Home() {
         <OnboardingCarousel open onDone={()=>{ setShowOnboarding(false); try { localStorage.setItem('onboardingSeen','1'); } catch {} }} />
       )}
       <TopBar/>
-  <Box sx={{ px:3, pb:3, flex:1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow:'hidden' }}>
+  <Box sx={{ px:3, pb:3, flex:1, display: 'flex', flexDirection: 'column', minHeight: 0, overflowY:'auto' }}>
         <Grid container spacing={3} sx={{ flex:1, minHeight: 0 }}>
           {/* Left: Services cards */}
           <Grid item xs={12} md={5} sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -85,7 +85,7 @@ export default function Home() {
           </Grid>
 
           {/* Right: Active panel */}
-          <Grid item xs={12} md={7} sx={{ height: '100%', display:'flex', flexDirection:'column', minHeight: 0 }}>
+          <Grid item xs={12} md={7} sx={{ height: '100%', display:'flex', flexDirection:'column', minHeight: 0, overflow: 'hidden' }}>
             <Box sx={{ 
               flex: 1, 
               minHeight: 0, 
@@ -106,7 +106,7 @@ export default function Home() {
                 </Box>
               )}
               {active === "assistant" && (
-                <Box sx={{ flex: 1, minHeight: 0, display:'flex', flexDirection:'column' }}>
+                <Box sx={{ flex: 1, minHeight: 0, display:'flex', flexDirection:'column', overflowY: 'auto' }}>
                   <PermitChatAssistant />
                 </Box>
               )}

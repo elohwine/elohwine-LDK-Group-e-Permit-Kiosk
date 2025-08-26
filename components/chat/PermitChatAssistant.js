@@ -34,10 +34,9 @@ const useLottieAsset = (path) => {
 };
 
 const BotAvatar = () => {
-  const primary = useLottieAsset('/lottie/live-chatbot.json');
-  const altName = useLottieAsset('/lottie/Livechatbot.json');
-  const alt = useLottieAsset('/lottie/Robotchat.json');
-  const botAnim = primary || altName || alt; // no success fallback for avatar
+  // Force a different animation than the header
+  const primary = useLottieAsset('/lottie/Robotchat.json');
+  const botAnim = primary; // no header fallbacks to avoid matching header
   return (
     <Box sx={{ width: 36, height: 36, borderRadius: '50%', overflow:'hidden', boxShadow: (t)=>`0 0 12px ${t.palette.primary.main}55`, bgcolor: (t)=>`${t.palette.background.paper}` }}>
       {botAnim ? (
@@ -95,10 +94,10 @@ export default function PermitChatAssistant(){
   const scrollRef = useRef(null);
   const [loaded, setLoaded] = useState(false);
   const typingRef = useRef(false);
+  // Use the original heading animation; only fall back to case-variant
   const headerAnimPrimary = useLottieAsset('/lottie/live-chatbot.json');
   const headerAnimNameAlt = useLottieAsset('/lottie/Livechatbot.json');
-  const headerAnimAlt = useLottieAsset('/lottie/Robotchat.json');
-  const headerAnim = headerAnimPrimary || headerAnimNameAlt || headerAnimAlt; // no success fallback for avatar/header
+  const headerAnim = headerAnimPrimary || headerAnimNameAlt;
 
   const append = (msgs) => {
     const arr = Array.isArray(msgs) ? msgs : [msgs];
@@ -332,21 +331,21 @@ export default function PermitChatAssistant(){
   };
 
   return (
-    <Box sx={{ height:'100%', display:'flex', flexDirection:'column', minHeight: 0 }}>
-      <Paper elevation={8} sx={{ p: 2, borderRadius: 3, height:'100%', display:'flex', flexDirection:'column', minHeight: 0, overflow:'hidden' }}>
-        {/* Compact header */}
-        <Box sx={{ display:'flex', alignItems:'center', justifyContent:'space-between', mb: 1, flexShrink: 0 }}>
-          <Box sx={{ display:'flex', alignItems:'center', gap: 1 }}>
-            <Box sx={{ width: 40, height: 40, borderRadius: '50%', overflow:'hidden', boxShadow: (t)=>`0 0 12px ${t.palette.primary.main}55`, bgcolor: (t)=>`${t.palette.background.paper}`, flexShrink: 0 }}>
+    <Box sx={{ height:'100%', display:'flex', flexDirection:'column', minHeight: 0, overflow: 'hidden' }}>
+      <Paper elevation={8} sx={{ p: 2, borderRadius: 3, height:'100%', display:'flex', flexDirection:'column', minHeight: 0, overflowY:'auto' }}>
+    {/* Header: centered icon with title below */}
+        <Box sx={{ display:'flex', alignItems:'center', justifyContent:'center', mb: 1, flexShrink: 0, position: 'relative' }}>
+          <Box sx={{ display:'flex', alignItems:'center', flexDirection:'column', gap: 0.75 }}>
+      <Box sx={{ width: 88, height: 88, borderRadius: '50%', overflow:'hidden', boxShadow: (t)=>`0 0 24px ${t.palette.primary.main}66`, bgcolor: (t)=>`${t.palette.background.paper}`, flexShrink: 0 }}>
               {headerAnim ? (
                 <Lottie autoplay loop animationData={headerAnim} style={{ width: '100%', height: '100%' }} />
               ) : (
                 <Box sx={{ width: '100%', height: '100%', bgcolor: (t)=>`${t.palette.primary.main}22` }} />
               )}
             </Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>Assistant</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, textAlign:'center' }}>Assistant</Typography>
           </Box>
-          <Button size="small" startIcon={<ReplayIcon/>} onClick={reset} color="inherit">Start over</Button>
+          <Button size="small" startIcon={<ReplayIcon/>} onClick={reset} color="inherit" sx={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}>Start over</Button>
         </Box>
         
         {/* Journey chips */}

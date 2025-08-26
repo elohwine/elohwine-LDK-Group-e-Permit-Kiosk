@@ -3,7 +3,6 @@ import { TextField, Button, Typography, Box, Alert, Paper, Divider, Grid, Circul
 import { issuePermit, getSettings } from "../lib/permits";
 import QrCode2Icon from "@mui/icons-material/QrCode2";
 import FeedbackDialog from "./animated/FeedbackDialog";
-import BrandWatermark from "./BrandWatermark";
 
 export default function ServiceForms() {
   const [vrm, setVrm] = useState("");
@@ -58,14 +57,13 @@ export default function ServiceForms() {
   }
 
   return (
-    <Paper elevation={12} sx={{ position:'relative', overflow:'hidden', p: 3, pb: 'calc(var(--kbd-inset, 0px) + 32px)', borderRadius: 3, bgcolor: 'background.paper' }}>
-      <BrandWatermark />
+  <Paper elevation={12} sx={{ position:'relative', overflow:'hidden', p: 3, pb: 'calc(var(--kbd-inset, 0px) + 48px)', borderRadius: 3, bgcolor: 'background.paper' }}>
       <Box sx={{ display:'flex', alignItems:'center', gap:1, mb:1 }}>
         <QrCode2Icon color="primary"/>
         <Typography variant="h5">Virtual e‑Permits</Typography>
       </Box>
   <Divider sx={{ mb:2, opacity:0.1 }}/>
-  <Box component="form" onSubmit={onSubmit} sx={{ maxWidth: 840 }}>
+  <Box component="form" onSubmit={onSubmit} sx={{ maxWidth: 880 }}>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} md={8}>
             <TextField fullWidth label="Vehicle Registration (VRM)" value={vrm} onChange={e=>setVrm(e.target.value)} required/>
