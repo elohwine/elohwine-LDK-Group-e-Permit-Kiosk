@@ -46,8 +46,8 @@ export default function OnboardingCarousel({ open = false, onDone, slides = defa
 
   if (!open) return null;
 
-  const next = () => setI((v)=> Math.min(v+1, slides.length-1));
-  const prev = () => setI((v)=> Math.max(v-1, 0));
+  const next = () => setI((v)=> (v+1) % slides.length);
+  const prev = () => setI((v)=> (v-1+slides.length) % slides.length);
   const finish = () => onDone?.();
 
   const slide = slides[i];
@@ -55,10 +55,10 @@ export default function OnboardingCarousel({ open = false, onDone, slides = defa
   // Auto-advance when idle; pause on any user interaction
   useEffect(()=>{
     if (reduceMotion) return; // respect reduced motion
-    const tick = setInterval(()=>{
+  const tick = setInterval(()=>{
       const idleFor = Date.now() - lastInteractionRef.current;
       if (idleFor >= autoMs) {
-        if (i < slides.length - 1) setI((v)=> Math.min(v+1, slides.length-1));
+    setI((v)=> (v+1) % slides.length);
       }
     }, Math.max(1000, Math.min(autoMs, 3000)));
     return ()=>clearInterval(tick);
@@ -109,23 +109,23 @@ export default function OnboardingCarousel({ open = false, onDone, slides = defa
             <Typography variant="body1" sx={{ color:'text.secondary', mb: 3 }}>{slide.desc}</Typography>
             <Box sx={{ display:'flex', gap:1 }}>
               <Button variant="outlined" color="inherit" onClick={finish}>Skip</Button>
-              <Button variant="contained" onClick={i===slides.length-1 ? finish : next}>
-                {i===slides.length-1 ? 'Done' : 'Next'}
+              <Button variant="contained" onClick={next}>
+                Next
               </Button>
             </Box>
           </Box>
         </Box>
-        <MobileStepper
+    <MobileStepper
           variant="dots"
           steps={slides.length}
           position="static"
           activeStep={i}
           sx={{ bgcolor:'transparent', px:2, py:1 }}
           nextButton={
-            <IconButton onClick={next} disabled={i===slides.length-1} aria-label="Next slide"><ArrowForwardIosIcon/></IconButton>
+      <IconButton onClick={next} aria-label="Next slide"><ArrowForwardIosIcon/></IconButton>
           }
           backButton={
-            <IconButton onClick={prev} disabled={i===0} aria-label="Previous slide"><ArrowBackIosNewIcon/></IconButton>
+      <IconButton onClick={prev} aria-label="Previous slide"><ArrowBackIosNewIcon/></IconButton>
           }
         />
       </Paper>

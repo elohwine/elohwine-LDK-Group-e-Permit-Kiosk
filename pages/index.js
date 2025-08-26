@@ -85,7 +85,7 @@ export default function Home() {
           </Grid>
 
           {/* Right: Active panel */}
-          <Grid item xs={12} md={7} sx={{ height: '100%', display:'flex', flexDirection:'column', minHeight: 0, overflow: 'hidden' }}>
+          <Grid item xs={12} md={7} sx={{ height: '100%', display:'flex', flexDirection:'column', minHeight: 0 }}>
             <Box sx={{ 
               flex: 1, 
               minHeight: 0, 
@@ -106,7 +106,7 @@ export default function Home() {
                 </Box>
               )}
               {active === "assistant" && (
-                <Box sx={{ flex: 1, minHeight: 0, display:'flex', flexDirection:'column', overflowY: 'auto' }}>
+                <Box sx={{ flex: 1, minHeight: 0, display:'flex', flexDirection:'column' }}>
                   <PermitChatAssistant />
                 </Box>
               )}

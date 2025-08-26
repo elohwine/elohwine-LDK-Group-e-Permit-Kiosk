@@ -7,7 +7,9 @@ export default function TopBar(){
   const [query, setQuery] = useState("");
   return (
   <Box sx={{ px: 3, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
-      <Typography variant="subtitle1" sx={{ opacity: 0.8 }}>Hello,&nbsp;<b>Guest</b></Typography>
+      <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+        Hello, <b>Guest</b> — Welcome to <b>Kiosk ePermit</b>
+      </Typography>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <Box sx={{ position:'relative', width: { xs: '100%', sm: 420 }, maxWidth: { xs: '100%', sm: '50vw' } }}>
           <TextField

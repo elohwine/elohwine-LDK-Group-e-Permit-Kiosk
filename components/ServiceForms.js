@@ -72,7 +72,7 @@ export default function ServiceForms() {
             <TextField fullWidth label={`Hours (default ${settings.defaultHours ?? 2})`} type="number" inputMode="decimal" inputProps={{ min: 0.5, step: 0.5 }} value={hours} onChange={e=>setHours(e.target.value)}/>
           </Grid>
           <Grid item xs={12} md={12}>
-            <TextField fullWidth label="Email (optional for PDF)" type="email" value={email} onChange={e=>setEmail(e.target.value)}/>
+            <TextField fullWidth label="Email (optional for reminder notifications)" type="email" value={email} onChange={e=>setEmail(e.target.value)}/>
           </Grid>
           <Grid item xs={12} md={12}>
             <Box sx={{ display:'flex', gap:2, flexWrap:'wrap', pt: 1, alignItems:'center' }}>

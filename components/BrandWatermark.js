@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Box } from '@mui/material';
 
 // Tries multiple logo paths and renders the first that loads; otherwise renders nothing.
-export default function BrandWatermark({ paths = ['/img/logo.png', '/img/logo.svg', '/img/logo.jpg'], maxSize = 360, opacity = 0.3, center = true }){
+export default function BrandWatermark({ paths = ['/icons/icon-512.png', '/icons/icon-192.png', '/reference.png', '/img/logo.png', '/img/logo.svg', '/img/logo.jpg'], maxSize = 360, opacity = 0.3, center = true }){
   const [src, setSrc] = useState(null);
   const triedRef = useRef({});
 
@@ -29,12 +29,12 @@ export default function BrandWatermark({ paths = ['/img/logo.png', '/img/logo.sv
 
   const Img = (
     <Box component="img" alt="Brand watermark" src={src}
-      sx={{ width: '100%', height: '100%', objectFit: 'contain', opacity }} />
+      sx={(t)=>({ width: '100%', height: '100%', objectFit: 'contain', opacity, mixBlendMode: t.palette.mode === 'dark' ? 'screen' : 'multiply' })} />
   );
 
   if (center) {
     return (
-      <Box aria-hidden sx={{ position:'absolute', inset:0, display:'grid', placeItems:'center', pointerEvents:'none', zIndex: -1 }}>
+      <Box aria-hidden sx={{ position:'absolute', inset:0, display:'grid', placeItems:'center', pointerEvents:'none', zIndex: 0 }}>
         <Box sx={{ width: maxSize, maxWidth: '60vw', aspectRatio: '1 / 1' }}>
           {Img}
         </Box>

@@ -94,10 +94,11 @@ export default function PermitChatAssistant(){
   const scrollRef = useRef(null);
   const [loaded, setLoaded] = useState(false);
   const typingRef = useRef(false);
-  // Use the original heading animation; only fall back to case-variant
+  // Use the original heading animation and fall back safely
   const headerAnimPrimary = useLottieAsset('/lottie/live-chatbot.json');
   const headerAnimNameAlt = useLottieAsset('/lottie/Livechatbot.json');
-  const headerAnim = headerAnimPrimary || headerAnimNameAlt;
+  const headerAnimRobotFallback = useLottieAsset('/lottie/Robotchat.json');
+  const headerAnim = headerAnimPrimary || headerAnimNameAlt || headerAnimRobotFallback;
 
   const append = (msgs) => {
     const arr = Array.isArray(msgs) ? msgs : [msgs];
@@ -208,9 +209,9 @@ export default function PermitChatAssistant(){
       const hours = parseInt(val, 10);
       if (!Number.isFinite(hours) || hours <= 0) { append({ side:'bot', text:'Please enter a valid number of hours (e.g., 2).' }); return; }
       setContext(c=>({ ...c, hours }));
-      setStage('apply_email');
-      markLastUserDelivered();
-      append({ side:'bot', text:'Optional: enter an email for the receipt. Or type skip.' });
+  setStage('apply_email');
+  markLastUserDelivered();
+  append({ side:'bot', text:'Optional: enter an email to receive reminder notifications (no PDF will be sent). Or type skip.' });
     } else if (stage==='apply_email') {
       const email = /@/.test(val.toLowerCase()) ? val : null;
       setContext(c=>({ ...c, email }));
@@ -332,7 +333,7 @@ export default function PermitChatAssistant(){
 
   return (
     <Box sx={{ height:'100%', display:'flex', flexDirection:'column', minHeight: 0, overflow: 'hidden' }}>
-      <Paper elevation={8} sx={{ p: 2, borderRadius: 3, height:'100%', display:'flex', flexDirection:'column', minHeight: 0, overflowY:'auto' }}>
+  <Paper elevation={8} sx={{ p: 2, borderRadius: 3, height:'100%', display:'flex', flexDirection:'column', minHeight: 0, overflow: 'hidden' }}>
     {/* Header: centered icon with title below */}
         <Box sx={{ display:'flex', alignItems:'center', justifyContent:'center', mb: 1, flexShrink: 0, position: 'relative' }}>
           <Box sx={{ display:'flex', alignItems:'center', flexDirection:'column', gap: 0.75 }}>

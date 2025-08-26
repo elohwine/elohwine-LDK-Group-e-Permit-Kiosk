@@ -62,3 +62,34 @@ ehthumbs_vista.db
 # Optional: Docker-related files if you manage them separately
 # Dockerfile
 # .dockerignore
+
+# Android / TWA build artifacts
+*.apk
+*.apks
+*.aab
+*.idsig
+*.ap_ 
+app-release-*.apk
+app-release-*.aab
+
+# Signing keys (never commit these)
+*.keystore
+*.jks
+keystore.jks
+android.keystore
+
+# Gradle / Android Studio
+.gradle/
+**/build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+*.iml
+
+# Bubblewrap / TWA intermediates (keep twa-manifest.json, ignore build)
+twa/.gradle/
+twa/build/
+
+# Misc mobile outputs
+*.map

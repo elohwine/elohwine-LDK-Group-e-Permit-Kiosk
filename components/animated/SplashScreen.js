@@ -60,7 +60,7 @@ export default function SplashScreen({ onDone, autoHideMs = 2200 }){
       role="dialog" aria-modal="true" aria-label="Loading"
     >
       <Box sx={{ textAlign:'center', position:'relative' }}>
-  <BrandWatermark center maxSize={280} opacity={0.2} paths={["/img/logo.png","/img/logo.svg","/img/logo.jpg"]} />
+  <BrandWatermark center maxSize={280} opacity={0.2} paths={["/icons/icon-512.png","/icons/icon-192.png","/reference.png","/img/logo.png","/img/logo.svg","/img/logo.jpg"]} />
         <Box sx={{ width: 220, height: 220, mx:'auto', mb: 2, position:'relative' }}>
           {anim ? (
             <Lottie autoplay={!reduceMotion} loop={!reduceMotion} animationData={anim} style={{ width:'100%', height:'100%' }} />
