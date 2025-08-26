@@ -26,9 +26,16 @@
     <string name="fullScopeUrl" translatable="false">https://elohwine-ldk-group-e-permit-kiosk.vercel.app/</string>
     <string name="generatorApp" translatable="false">bubblewrap-cli</string>
     <string name="hostName" translatable="false">elohwine-ldk-group-e-permit-kiosk.vercel.app</string>
-    <string name="launchUrl" translatable="false">https://elohwine-ldk-group-e-permit-kiosk.vercel.app/</string>
+    <string name="launchHandlerClientMode" translatable="false">focus-existing</string>
+    <string name="launchUrl" translatable="false">https://elohwine-ldk-group-e-permit-kiosk.vercel.app/?source=pwa</string>
     <string name="launcherName" translatable="false">ePermit</string>
-    <string name="orientation" translatable="false">default</string>
+    <string name="orientation" translatable="false">natural</string>
     <string name="providerAuthority" translatable="false">app.vercel.elohwine_ldk_group_e_permit_kiosk.twa.fileprovider</string>
+    <string name="shortcut_name_0" translatable="false">Apply for Permit</string>
+    <string name="shortcut_name_1" translatable="false">Renew Permit</string>
+    <string name="shortcut_name_2" translatable="false">Verify Permit</string>
+    <string name="shortcut_short_name_0" translatable="false">Apply</string>
+    <string name="shortcut_short_name_1" translatable="false">Renew</string>
+    <string name="shortcut_short_name_2" translatable="false">Verify</string>
     <string name="webManifestUrl" translatable="false">https://elohwine-ldk-group-e-permit-kiosk.vercel.app/manifest.json</string>
 </resources>

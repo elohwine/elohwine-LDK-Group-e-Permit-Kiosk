@@ -3,7 +3,7 @@
   "host": "elohwine-ldk-group-e-permit-kiosk.vercel.app",
   "name": "Kiosk ePermit",
   "launcherName": "ePermit",
-  "display": "standalone",
+  "display": "fullscreen-sticky",
   "themeColor": "#1374BC",
   "themeColorDark": "#000000",
   "navigationColor": "#000000",
@@ -12,8 +12,9 @@
   "navigationDividerColorDark": "#000000",
   "backgroundColor": "#FFFFFF",
   "enableNotifications": true,
-  "startUrl": "/",
+  "startUrl": "/?source=pwa",
   "iconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/icon-512.png",
+  "maskableIconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/icon-512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "/home/eloh/kiosk-epermit-mui-v5/android.keystore",
@@ -21,7 +22,26 @@
   },
   "appVersionName": "1",
   "appVersionCode": 1,
-  "shortcuts": [],
+  "shortcuts": [
+    {
+      "name": "Apply for Permit",
+      "shortName": "Apply",
+      "url": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/apply",
+      "chosenIconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/icon-192.png"
+    },
+    {
+      "name": "Renew Permit",
+      "shortName": "Renew",
+      "url": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/renew",
+      "chosenIconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/icon-192.png"
+    },
+    {
+      "name": "Verify Permit",
+      "shortName": "Verify",
+      "url": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/verify",
+      "chosenIconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/icon-192.png"
+    }
+  ],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/manifest.json",
   "fallbackType": "customtabs",
@@ -34,12 +54,17 @@
   "isMetaQuest": false,
   "fullScopeUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/",
   "minSdkVersion": 21,
-  "orientation": "default",
+  "orientation": "natural",
   "fingerprints": [],
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
-  "protocolHandlers": [],
+  "protocolHandlers": [
+    {
+      "protocol": "web+epermit",
+      "url": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/protocol-handler?url=%s"
+    }
+  ],
   "fileHandlers": [],
-  "launchHandlerClientMode": "",
+  "launchHandlerClientMode": "focus-existing",
   "appVersion": "1"
 }

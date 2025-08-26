@@ -34,13 +34,27 @@
     <!-- Value from default config. -->
     <string name="hostName" translatable="false">elohwine-ldk-group-e-permit-kiosk.vercel.app</string>
     <!-- Value from default config. -->
-    <string name="launchUrl" translatable="false">https://elohwine-ldk-group-e-permit-kiosk.vercel.app/</string>
+    <string name="launchHandlerClientMode" translatable="false">focus-existing</string>
+    <!-- Value from default config. -->
+    <string name="launchUrl" translatable="false">https://elohwine-ldk-group-e-permit-kiosk.vercel.app/?source=pwa</string>
     <!-- Value from default config. -->
     <string name="launcherName" translatable="false">ePermit</string>
     <!-- Value from default config. -->
-    <string name="orientation" translatable="false">default</string>
+    <string name="orientation" translatable="false">natural</string>
     <!-- Value from default config. -->
     <string name="providerAuthority" translatable="false">app.vercel.elohwine_ldk_group_e_permit_kiosk.twa.fileprovider</string>
+    <!-- Value from default config. -->
+    <string name="shortcut_name_0" translatable="false">Apply for Permit</string>
+    <!-- Value from default config. -->
+    <string name="shortcut_name_1" translatable="false">Renew Permit</string>
+    <!-- Value from default config. -->
+    <string name="shortcut_name_2" translatable="false">Verify Permit</string>
+    <!-- Value from default config. -->
+    <string name="shortcut_short_name_0" translatable="false">Apply</string>
+    <!-- Value from default config. -->
+    <string name="shortcut_short_name_1" translatable="false">Renew</string>
+    <!-- Value from default config. -->
+    <string name="shortcut_short_name_2" translatable="false">Verify</string>
     <!-- Value from default config. -->
     <string name="webManifestUrl" translatable="false">https://elohwine-ldk-group-e-permit-kiosk.vercel.app/manifest.json</string>
 

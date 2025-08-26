@@ -654,6 +654,9 @@ drawable notification_template_icon_bg
 drawable notification_template_icon_low_bg
 drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
+drawable shortcut_0
+drawable shortcut_1
+drawable shortcut_2
 drawable shortcut_legacy_background
 drawable splash
 drawable test_level_drawable
@@ -901,6 +904,7 @@ layout select_dialog_multichoice_material
 layout select_dialog_singlechoice_material
 layout support_simple_spinner_dropdown_item
 mipmap ic_launcher
+mipmap ic_maskable
 raw web_app_manifest
 string abc_action_bar_home_description
 string abc_action_bar_up_description
@@ -948,6 +952,7 @@ string fallback_menu_item_share_link
 string fullScopeUrl
 string generatorApp
 string hostName
+string launchHandlerClientMode
 string launchUrl
 string launcherName
 string manage_space_no_data_toast
@@ -956,6 +961,12 @@ string no_provider_toast
 string orientation
 string providerAuthority
 string search_menu_title
+string shortcut_name_0
+string shortcut_name_1
+string shortcut_name_2
+string shortcut_short_name_0
+string shortcut_short_name_1
+string shortcut_short_name_2
 string status_bar_notification_info_overflow
 string update_chrome_toast
 string webManifestUrl

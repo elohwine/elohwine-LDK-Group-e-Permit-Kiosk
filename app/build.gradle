@@ -23,7 +23,7 @@ plugins {
 def twaManifest = [
     applicationId: 'app.vercel.elohwine_ldk_group_e_permit_kiosk.twa',
     hostName: 'elohwine-ldk-group-e-permit-kiosk.vercel.app', // The domain being opened in the TWA.
-    launchUrl: '/', // The start path for the TWA. Must be relative to the domain.
+    launchUrl: '/?source=pwa', // The start path for the TWA. Must be relative to the domain.
     name: 'Kiosk ePermit', // The application name.
     launcherName: 'ePermit', // The name shown on the Android Launcher.
     themeColor: '#1374BC', // The color used for the status bar.
@@ -39,7 +39,7 @@ def twaManifest = [
     // - short_name: Shorter string used if |name| is too long.
     // - url: Absolute path of the URL to launch the app with (e.g '/create').
     // - icon: Name of the resource in the drawable folder to use as an icon.
-    shortcuts: [],
+    shortcuts: [[name:'Apply for Permit', short_name:'Apply', url:'https://elohwine-ldk-group-e-permit-kiosk.vercel.app/apply', icon:'shortcut_0'],[name:'Renew Permit', short_name:'Renew', url:'https://elohwine-ldk-group-e-permit-kiosk.vercel.app/renew', icon:'shortcut_1'],[name:'Verify Permit', short_name:'Verify', url:'https://elohwine-ldk-group-e-permit-kiosk.vercel.app/verify', icon:'shortcut_2']],
     // The duration of fade out animation in milliseconds to be played when removing splash screen.
     splashScreenFadeOutDuration: 300,
     generatorApp: 'bubblewrap-cli', // Application that generated the Android Project
@@ -47,7 +47,7 @@ def twaManifest = [
     // 'customtabs' and 'webview'.
     fallbackType: 'customtabs',
     enableSiteSettingsShortcut: 'true',
-    orientation: 'default',
+    orientation: 'natural',
 ]
 
 android {
@@ -70,6 +70,8 @@ android {
         def launchUrl = "https://" + twaManifest.hostName + twaManifest.launchUrl
         resValue "string", "launchUrl", launchUrl
 
+        
+            resValue "string", "launchHandlerClientMode", 'focus-existing'
         
 
         

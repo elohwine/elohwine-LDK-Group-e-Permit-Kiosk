@@ -98,7 +98,7 @@ export default function PermitChatAssistant(){
   const headerAnimPrimary = useLottieAsset('/lottie/live-chatbot.json');
   const headerAnimNameAlt = useLottieAsset('/lottie/Livechatbot.json');
   const headerAnimRobotFallback = useLottieAsset('/lottie/Robotchat.json');
-  const headerAnim = headerAnimPrimary || headerAnimNameAlt || headerAnimRobotFallback;
+  const headerAnim = headerAnimNameAlt ;
 
   const append = (msgs) => {
     const arr = Array.isArray(msgs) ? msgs : [msgs];
@@ -211,7 +211,7 @@ export default function PermitChatAssistant(){
       setContext(c=>({ ...c, hours }));
   setStage('apply_email');
   markLastUserDelivered();
-  append({ side:'bot', text:'Optional: enter an email to receive reminder notifications (no PDF will be sent). Or type skip.' });
+  append({ side:'bot', text:'Optional: enter an email to receive reminder notifications (Or type skip.' });
     } else if (stage==='apply_email') {
       const email = /@/.test(val.toLowerCase()) ? val : null;
       setContext(c=>({ ...c, email }));

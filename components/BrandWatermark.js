@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Box } from '@mui/material';
 
 // Tries multiple logo paths and renders the first that loads; otherwise renders nothing.
-export default function BrandWatermark({ paths = ['/icons/icon-512.png', '/icons/icon-192.png', '/reference.png', '/img/logo.png', '/img/logo.svg', '/img/logo.jpg'], maxSize = 360, opacity = 0.3, center = true }){
+export default function BrandWatermark({ paths = [ '/img/logo.png', '/img/logo.svg', '/img/logo.jpg'], maxSize = 360, opacity = 0.3, center = true }){
   const [src, setSrc] = useState(null);
   const triedRef = useRef({});
 

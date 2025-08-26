@@ -3,8 +3,8 @@
 # min_api: 21
 # common_typos_disable
 # {"id":"com.android.tools.r8.mapping","version":"2.2"}
-# pg_map_id: 4dfbef0
-# pg_map_hash: SHA-256 4dfbef0fe1f4063c6046cbb1341f67c3eeac87e4793b76d763fe9b753f59b845
+# pg_map_id: 2a5df52
+# pg_map_hash: SHA-256 2a5df52901fb59738a56699997eec21986e06021d1ca6f9fa126711c3ee7daf1
 android.support.customtabs.ICustomTabsCallback -> a.a:
 # {"id":"sourceFile","fileName":"ICustomTabsCallback.java"}
     java.lang.String DESCRIPTOR -> a
@@ -22704,12 +22704,14 @@ app.vercel.elohwine_ldk_group_e_permit_kiosk.twa.DelegationService -> app.vercel
     1:4:void onCreate():9:9 -> onCreate
 app.vercel.elohwine_ldk_group_e_permit_kiosk.twa.LauncherActivity -> app.vercel.elohwine_ldk_group_e_permit_kiosk.twa.LauncherActivity:
 # {"id":"sourceFile","fileName":"LauncherActivity.java"}
-    1:4:void <init>():25:25 -> <init>
-    1:5:android.net.Uri getLaunchingUrl():48:48 -> i
-    1:3:void onCreate(android.os.Bundle):33:33 -> onCreate
-    4:10:void onCreate(android.os.Bundle):38:38 -> onCreate
-    11:14:void onCreate(android.os.Bundle):39:39 -> onCreate
-    15:18:void onCreate(android.os.Bundle):41:41 -> onCreate
+    1:4:void <init>():29:29 -> <init>
+    1:5:android.net.Uri getLaunchingUrl():59:59 -> i
+    1:5:java.util.Map getProtocolHandlers():36:36 -> j
+    6:17:java.util.Map getProtocolHandlers():37:37 -> j
+    1:3:void onCreate(android.os.Bundle):44:44 -> onCreate
+    4:10:void onCreate(android.os.Bundle):49:49 -> onCreate
+    11:14:void onCreate(android.os.Bundle):50:50 -> onCreate
+    15:18:void onCreate(android.os.Bundle):52:52 -> onCreate
 com.google.androidbrowserhelper.R$drawable -> I.a:
     int ic_site_settings -> a
 com.google.androidbrowserhelper.R$string -> I.b:
@@ -22856,7 +22858,7 @@ com.google.androidbrowserhelper.trusted.LauncherActivity -> J.h:
     112:132:android.net.Uri getLaunchingUrl():440:440 -> i
     133:157:android.net.Uri getLaunchingUrl():444:444 -> i
     158:178:android.net.Uri getLaunchingUrl():448:448 -> i
-    1:3:java.util.Map getProtocolHandlers():394:394 -> j
+    java.util.Map getProtocolHandlers() -> j
     1:3:android.widget.ImageView$ScaleType getSplashImageScaleType():334:334 -> k
     1:2:android.graphics.Matrix getSplashImageTransformationMatrix():345:345 -> l
     1:6:void launchTwa():203:203 -> m

@@ -1,4 +1,4 @@
-#Tue Aug 26 12:05:21 SAST 2025
+#Tue Aug 26 17:28:24 SAST 2025
 base.0=/home/eloh/kiosk-epermit-mui-v5/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 renamed.0=classes.dex
 path.0=classes.dex
