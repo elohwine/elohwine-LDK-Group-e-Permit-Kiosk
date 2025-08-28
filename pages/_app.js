@@ -15,7 +15,7 @@ function ModeToggle() {
   const { toggle } = useColorMode();
   return (
     <Tooltip title="Toggle light/dark mode">
-      <IconButton color="inherit" onClick={toggle} sx={{ position:'fixed', right: 12, bottom: 12, zIndex: (t)=>t.zIndex.tooltip + 1 }} aria-label="toggle color mode">
+  <IconButton color="inherit" onClick={toggle} sx={{ position:'fixed', right: 'calc(env(safe-area-inset-right, 0px) + 12px)', bottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)', zIndex: (t)=>t.zIndex.tooltip + 1 }} aria-label="toggle color mode">
         <Brightness6Icon />
       </IconButton>
     </Tooltip>
@@ -40,7 +40,10 @@ function MyApp({ Component, pageProps }) {
         sx={(t)=>({
           minHeight: '100%',
           position: 'relative',
-      paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          pt: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+          pb: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
+          pl: 'calc(env(safe-area-inset-left, 0px) + 8px)',
+          pr: 'calc(env(safe-area-inset-right, 0px) + 8px)',
           background: t.palette.mode === 'dark'
             ? 'radial-gradient(1200px 600px at 20% 0%, #2a303c 0%, #1b202a 40%, #121621 100%)'
             : 'radial-gradient(1200px 600px at 20% 0%, #f2f7ff 0%, #e6f0ff 35%, #d6e8ff 65%, #cce2ff 100%)'

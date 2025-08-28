@@ -13,11 +13,14 @@ import dynamic from 'next/dynamic';
 const PermitChatAssistant = dynamic(() => import('../components/chat/PermitChatAssistant'), { ssr: false });
 const SplashScreen = dynamic(() => import('../components/animated/SplashScreen'), { ssr: false });
 const OnboardingCarousel = dynamic(() => import('../components/animated/OnboardingCarousel'), { ssr: false });
+const AdminSettings = dynamic(() => import('./admin/settings'), { ssr: false });
+import { getSettings } from "../lib/permits";
 
 export default function Home() {
   const [active, setActive] = useState("assistant");
   const [showSplash, setShowSplash] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [settings, setSettings] = useState(null);
 
   useEffect(()=>{
     // Optional: only show once per session
@@ -45,6 +48,10 @@ export default function Home() {
     return ()=>{ events.forEach(ev=>window.removeEventListener(ev, onActivity)); clearTimeout(idleTimer); };
   },[]);
 
+  useEffect(()=>{
+    (async()=> setSettings(await getSettings()))();
+  },[]);
+
   const cards = [
     { key: "pay", title: "Pay to Park", icon: <LocalParkingIcon fontSize="large"/> , color:"default" },
     { key: "epermit", title: "Virtual e‑Permits", icon: <QrCode2Icon fontSize="large"/> , color:"primary" },
@@ -61,31 +68,35 @@ export default function Home() {
       {showOnboarding && (
         <OnboardingCarousel open onDone={()=>{ setShowOnboarding(false); try { localStorage.setItem('onboardingSeen','1'); } catch {} }} />
       )}
-  <TopBar/>
-  <Box sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 }, flex:1, display: 'flex', flexDirection: 'column', minHeight: 0, overflowY:'auto' }}>
+  <TopBar active={active} siteName={settings?.siteName} onBackToServices={()=>setActive('assistant')} onOpenSettings={()=>setActive('settings')}/>
+  <Box sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 }, flex:1, display: 'flex', flexDirection: 'column', minHeight: 0, overflowY: active === 'assistant' ? 'hidden' : 'auto' }}>
     <Grid container spacing={{ xs: 2, md: 3 }} sx={{ flex:1, minHeight: 0 }}>
-          {/* Left: Services cards */}
-          <Grid item xs={12} md={5} sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography variant="h6" sx={{ mb:2, color:'text.secondary', flexShrink: 0 }}>Services</Typography>
-            <Box sx={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
-              <Grid container spacing={2}>
-                {cards.map(c => (
-                  <Grid item xs={6} key={c.key}>
-                    <ServiceCard
-                      title={c.title}
-                      icon={c.icon}
-                      color={c.color}
-                      active={active === c.key}
-                      onClick={() => setActive(c.key)}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-          </Grid>
+          {/* Left: Services cards (hidden on Settings to maximize space) */}
+          {active !== 'settings' && (
+            <Grid item xs={12} md={5} sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="h6" sx={{ mb:2, color:'text.secondary', flexShrink: 0 }}>Services</Typography>
+              <Box sx={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+                <Grid container spacing={2}>
+                  {cards
+                    .filter(c => c.key !== 'payments' || (settings?.paymentsEnabled ?? true))
+                    .map(c => (
+                    <Grid item xs={6} key={c.key}>
+                      <ServiceCard
+                        title={c.title}
+                        icon={c.icon}
+                        color={c.color}
+                        active={active === c.key}
+                        onClick={() => setActive(c.key)}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+            </Grid>
+          )}
 
           {/* Right: Active panel */}
-          <Grid item xs={12} md={7} sx={{ height: '100%', display:'flex', flexDirection:'column', minHeight: 0 }}>
+          <Grid item xs={12} md={active === 'settings' ? 12 : 7} sx={{ height: '100%', display:'flex', flexDirection:'column', minHeight: 0 }}>
             <Box sx={{ 
               flex: 1, 
               minHeight: 0, 
@@ -108,6 +119,11 @@ export default function Home() {
               {active === "assistant" && (
                 <Box sx={{ flex: 1, minHeight: 0, display:'flex', flexDirection:'column' }}>
                   <PermitChatAssistant />
+                </Box>
+              )}
+        {active === "settings" && (
+                <Box sx={{ flex: 1, minHeight: 0, overflow:'auto' }}>
+          <AdminSettings onSaved={async()=> setSettings(await getSettings())} />
                 </Box>
               )}
             </Box>

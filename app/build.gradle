@@ -47,7 +47,7 @@ def twaManifest = [
     // 'customtabs' and 'webview'.
     fallbackType: 'customtabs',
     enableSiteSettingsShortcut: 'true',
-    orientation: 'natural',
+    orientation: 'portrait-primary',
 ]
 
 android {
@@ -86,6 +86,9 @@ android {
             resValue "string", "fullScopeUrl", 'https://elohwine-ldk-group-e-permit-kiosk.vercel.app/'
         
 
+        
+            // The data for the app to support web share target.
+            resValue "string", "shareTarget", '{\\"action\\":\\"https://elohwine-ldk-group-e-permit-kiosk.vercel.app/share\\",\\"method\\":\\"POST\\",\\"enctype\\":\\"multipart/form-data\\",\\"params\\":{\\"title\\":\\"title\\",\\"text\\":\\"text\\",\\"url\\":\\"url\\",\\"files\\":[{\\"name\\":\\"files\\",\\"accept\\":[\\"image/*\\",\\"application/*\\",\\"text/*\\",\\"*/*\\"]}]}}'
         
 
         // The hostname is used when building the intent-filter, so the TWA is able to
@@ -150,6 +153,8 @@ android {
         resValue "bool", "enableSiteSettingsShortcut", twaManifest.enableSiteSettingsShortcut
         resValue "string", "orientation", twaManifest.orientation
 
+        
+        resValue "string", "fileHandlingActionUrl0", "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/open-file"
         
     }
     buildTypes {

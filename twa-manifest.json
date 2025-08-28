@@ -3,7 +3,7 @@
   "host": "elohwine-ldk-group-e-permit-kiosk.vercel.app",
   "name": "Kiosk ePermit",
   "launcherName": "ePermit",
-  "display": "fullscreen",
+  "display": "standalone",
   "themeColor": "#1374BC",
   "themeColorDark": "#000000",
   "navigationColor": "#000000",
@@ -13,9 +13,8 @@
   "backgroundColor": "#FFFFFF",
   "enableNotifications": true,
   "startUrl": "/?source=pwa",
-  "iconUrl": "https://elohwine-ldk-group-e-permit-kiosk-git-main-elohwines-projects.vercel.app/img/logo.png",
-  "maskableIconUrl": "https://elohwine-ldk-group-e-permit-kiosk-git-main-elohwines-projects.vercel.app/img/logo.png",
-  "monochromeIconUrl": "https://elohwine-ldk-group-e-permit-kiosk-git-main-elohwines-projects.vercel.app/img/logo.png",
+  "iconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/icon-512.png",
+  "maskableIconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/icon-512-maskable.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "/home/eloh/kiosk-epermit-mui-v5/android.keystore",
@@ -28,19 +27,22 @@
       "name": "Apply for Permit",
       "shortName": "Apply",
       "url": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/apply",
-      "chosenIconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/icon-192.png"
+      "chosenIconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/icon-192.png",
+      "chosenMonochromeIconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/shortcut-96-mono.png"
     },
     {
       "name": "Renew Permit",
       "shortName": "Renew",
       "url": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/renew",
-      "chosenIconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/icon-192.png"
+      "chosenIconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/icon-192.png",
+      "chosenMonochromeIconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/shortcut-96-mono.png"
     },
     {
       "name": "Verify Permit",
       "shortName": "Verify",
       "url": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/verify",
-      "chosenIconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/icon-192.png"
+      "chosenIconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/icon-192.png",
+      "chosenMonochromeIconUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/icons/shortcut-96-mono.png"
     }
   ],
   "generatorApp": "bubblewrap-cli",
@@ -50,12 +52,34 @@
   "alphaDependencies": {
     "enabled": false
   },
-  "enableSiteSettingsShortcut": true,
   "isChromeOSOnly": false,
   "isMetaQuest": false,
+  "enableSiteSettingsShortcut": false,
+  "fullscreen": true,
   "fullScopeUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/",
   "minSdkVersion": 21,
-  "orientation": "natural",
+  "shareTarget": {
+    "action": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "files",
+          "accept": [
+            "image/*",
+            "application/*",
+            "text/*",
+            "*/*"
+          ]
+        }
+      ]
+    }
+  },
+  "orientation": "portrait-primary",
   "fingerprints": [],
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
@@ -65,7 +89,15 @@
       "url": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/protocol-handler?url=%s"
     }
   ],
-  "fileHandlers": [],
+  "fileHandlers": [
+    {
+      "actionUrl": "https://elohwine-ldk-group-e-permit-kiosk.vercel.app/open-file",
+      "mimeTypes": [
+        "application/json",
+        "text/plain"
+      ]
+    }
+  ],
   "launchHandlerClientMode": "focus-existing",
   "appVersion": "1"
 }

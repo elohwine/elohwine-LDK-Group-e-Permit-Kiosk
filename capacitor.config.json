@@ -1,0 +1,15 @@
+{
+  "appId": "com.ldk.kiosk",
+  "appName": "Kiosk E-Permit",
+  "webDir": "out",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0,
+      "backgroundColor": "#1374bc",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false
+    }
+  }
+}

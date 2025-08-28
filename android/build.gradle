@@ -1,0 +1,49 @@
+// Root-level Gradle build file for the Android project.
+// Configures the Android Gradle Plugin and common repositories.
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // Android Gradle Plugin
+        classpath 'com.android.tools.build:gradle:8.6.1'
+        // Google services plugin (optional; only applied if google-services.json exists in :app)
+        classpath 'com.google.gms:google-services:4.4.2'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+// Shared Android SDK/version variables
+apply from: 'variables.gradle'
+
+// Enforce Java 17 across all Android subprojects (app, capacitor-android, cordova plugins)
+subprojects { proj ->
+    // Ensure JavaCompile tasks target Java 17 without using the unsupported --release flag
+    tasks.withType(JavaCompile).configureEach {
+        // Do not set options.release here (breaks AGP bootclasspath)
+        sourceCompatibility = JavaVersion.VERSION_17.toString()
+        targetCompatibility = JavaVersion.VERSION_17.toString()
+    }
+
+    // For Android modules, set compileOptions to 17
+    afterEvaluate {
+        if (proj.plugins.hasPlugin('com.android.application') || proj.plugins.hasPlugin('com.android.library')) {
+            proj.extensions.findByName('android')?.compileOptions?.with {
+                sourceCompatibility = JavaVersion.VERSION_17
+                targetCompatibility = JavaVersion.VERSION_17
+            }
+        }
+    }
+}
+
+tasks.register('clean', Delete) {
+    delete rootProject.buildDir
+}

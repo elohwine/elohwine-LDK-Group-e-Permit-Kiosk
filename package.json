@@ -6,10 +6,22 @@
   "dev": "node scripts/generate-icons.js && next dev",
   "prebuild": "node scripts/generate-icons.js",
   "build": "next build",
-  "start": "next start",
-  "icons": "node scripts/generate-icons.js"
+  "export": "next export",
+  "build:web": "npm run build && npm run export",
+    "start": "next start",
+  "icons": "node scripts/generate-icons.js",
+  "native:prep": "node scripts/prepare-native-assets.js",
+  "native:gen": "npm run native:prep && npx @capacitor/assets generate android",
+  "cap:copy": "npm run build:web && npm run native:gen && npx cap copy android",
+  "cap:sync": "npm run build:web && npm run native:gen && npx cap sync android",
+  "cap:open": "npx cap open android",
+  "android:release": "bash ./build-and-sign-apk.sh",
+  "android:release:node": "node scripts/run-android-release.js"
   },
   "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
     "@emotion/react": "11.11.4",
     "@emotion/styled": "11.11.5",
     "@mui/icons-material": "5.15.14",
@@ -17,13 +29,13 @@
     "framer-motion": "6.5.1",
     "idb-keyval": "6.2.1",
     "lottie-react": "2.4.0",
-    "next": "12.2.5",
+  "next": "12.2.5",
     "next-pwa": "5.6.0",
     "next-themes": "0.2.1",
     "qrcode": "1.5.4",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "workbox-precaching": "^7.3.0",
-    "sharp": "^0.32.6"
+    "sharp": "^0.32.6",
+  "workbox-precaching": "^7.3.0"
   }
 }

@@ -7,7 +7,7 @@ const sharp = require('sharp');
 sharp.cache(false);
 
 const root = process.cwd();
-const src = path.join(root, 'public', 'img', 'logo.png');
+const src = path.join(root, 'public', 'img', 'logo_light.png');
 const outDir = path.join(root, 'public', 'icons');
 
 async function main(){
