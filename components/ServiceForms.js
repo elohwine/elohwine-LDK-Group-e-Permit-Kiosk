@@ -32,9 +32,9 @@ export default function ServiceForms() {
         vrm, email: email || undefined, hours: hours ? parseFloat(hours) : undefined
       });
       setResult({ permit, online });
-      // Open success dialog with details
+      // Offline save is still a successful kiosk action; show success-state UX.
       setDlgType('success');
-      setDlgMsg('Permit issued successfully');
+      setDlgMsg(online ? 'Permit issued successfully' : 'Permit saved in offline mode and will sync automatically when back online.');
       setDlgDetails({
         id: permit.id,
         vrm: permit.vrm,
@@ -57,14 +57,14 @@ export default function ServiceForms() {
   }
 
   return (
-  <Paper elevation={12} sx={{ position:'relative', overflow:'hidden', p: { xs: 2, sm: 3 }, pb: 'calc(var(--kbd-inset, 0px) + 56px)', borderRadius: 3, bgcolor: 'background.paper' }}>
-      <Box sx={{ display:'flex', alignItems:'center', gap:1, mb:1 }}>
-        <QrCode2Icon color="primary"/>
-        <Typography variant="h5">Virtual e‑Permits</Typography>
+  <Paper elevation={12} sx={{ position:'relative', overflow:'hidden', p: { xs: 1.5, sm: 2.5, md: 3.5 }, pb: 'calc(var(--kbd-inset, 0px) + 40px)', borderRadius: { xs: 2, sm: 3 }, bgcolor: 'background.paper' }}>
+      <Box sx={{ display:'flex', alignItems:'center', gap: { xs: 0.5, sm: 1 }, mb: { xs: 0.5, sm: 1 } }}>
+        <QrCode2Icon color="primary" sx={{ fontSize: { xs: '1.3rem', sm: '1.6rem' } }} />
+        <Typography variant="h5" sx={{ fontSize: { xs: '1.05rem', sm: '1.35rem' } }}>Virtual e‑Permits</Typography>
       </Box>
-  <Divider sx={{ mb:2, opacity:0.1 }}/>
+  <Divider sx={{ mb: { xs: 1, sm: 2 }, opacity:0.1 }}/>
   <Box component="form" onSubmit={onSubmit} sx={{ maxWidth: { xs: '100%', md: 880 } }}>
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={{ xs: 1.5, sm: 2.5 }} alignItems="center">
           <Grid item xs={12} md={8}>
             <TextField fullWidth label="Vehicle Registration (VRM)" value={vrm} onChange={e=>setVrm(e.target.value)} required/>
           </Grid>
@@ -72,11 +72,11 @@ export default function ServiceForms() {
             <TextField fullWidth label={`Hours (default ${settings.defaultHours ?? 2})`} type="number" inputMode="decimal" inputProps={{ min: 0.5, step: 0.5 }} value={hours} onChange={e=>setHours(e.target.value)}/>
           </Grid>
           <Grid item xs={12} md={12}>
-            <TextField fullWidth label="Email (optional for reminder notifications)" type="email" value={email} onChange={e=>setEmail(e.target.value)}/>
+            <TextField fullWidth label="Email (optional — ePermit delivered here)" type="email" value={email} onChange={e=>setEmail(e.target.value)}/>
           </Grid>
           <Grid item xs={12} md={12}>
             <Box sx={{ display:'flex', gap:2, flexWrap:'wrap', pt: 1, alignItems:'stretch' }}>
-              <Button fullWidth sx={{ maxWidth: { sm: 240 } }} type="submit" variant="contained" size="large" disabled={loading}>
+              <Button fullWidth sx={{ maxWidth: { sm: 240 } }} type="submit" variant="contained" size="medium" disabled={loading}>
                 {loading ? (
                   <Box sx={{ display:'flex', alignItems:'center', gap:1 }}>
                     <CircularProgress size={18} color="inherit"/>
@@ -84,7 +84,7 @@ export default function ServiceForms() {
                   </Box>
                 ) : 'Issue Permit'}
               </Button>
-              <Button fullWidth sx={{ maxWidth: { sm: 200 } }} variant="outlined" href="/verify" size="large">Verify</Button>
+              <Button fullWidth sx={{ maxWidth: { sm: 200 } }} variant="outlined" href="/verify" size="medium">Verify</Button>
             </Box>
           </Grid>
         </Grid>
@@ -96,12 +96,16 @@ export default function ServiceForms() {
         open={dlgOpen}
         onClose={()=>setDlgOpen(false)}
         type={dlgType}
-        title={dlgType==='success' ? 'Permit Issued' : 'Issuance Failed'}
+        title={dlgType==='error'
+          ? 'Issuance Failed'
+          : dlgDetails?.mode === 'offline'
+            ? 'Permit Saved Offline'
+            : 'Permit Issued'}
         message={dlgMsg}
         details={dlgDetails}
-  lottiePath={dlgType==='success' ? '/lottie/success.json' : '/lottie/Error.json'}
+  lottiePath={dlgType==='error' ? '/lottie/Error.json' : '/lottie/success.json'}
         onPrimary={()=>setDlgOpen(false)}
-        primaryText={dlgType==='success' ? 'Done' : 'Retry'}
+        primaryText={dlgType==='error' ? 'Retry' : 'Done'}
       />
     </Paper>
   );
