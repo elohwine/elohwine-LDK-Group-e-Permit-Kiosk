@@ -1,49 +1,94 @@
 import { Box, IconButton, Typography, Tooltip } from "@mui/material";
-import SettingsIcon from "@mui/icons-material/Settings";
-import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import { keyframes } from "@mui/system";
+import { useTheme } from "@mui/material/styles";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
-export default function TopBar({ onOpenSettings, active, onBackToServices, siteName }){
-  const pulse = keyframes`
-    0% { transform: scale(1); }
-    50% { transform: scale(1.06); }
-    100% { transform: scale(1); }
-  `;
+// Kiosk online/heartbeat status dot — self-contained, no prop drilling needed
+function KioskStatusDot() {
+  const [lastHb, setLastHb] = useState(null); // timestamp of last heartbeat_ok
+  const [browserOnline, setBrowserOnline] = useState(
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+
+  useEffect(() => {
+    const onHb = (e) => setLastHb(e.detail?.timestamp ?? Date.now());
+    const onOnline = () => setBrowserOnline(true);
+    const onOffline = () => setBrowserOnline(false);
+    window.addEventListener('kiosk:heartbeat_ok', onHb);
+    window.addEventListener('online', onOnline);
+    window.addEventListener('offline', onOffline);
+    return () => {
+      window.removeEventListener('kiosk:heartbeat_ok', onHb);
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('offline', onOffline);
+    };
+  }, []);
+
+  // Recompute colour every 30s so stale indicators turn amber automatically
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => tick(n => n + 1), 30_000);
+    return () => clearInterval(t);
+  }, []);
+
+  const ageMs = lastHb ? Date.now() - lastHb : null;
+  let color, label;
+  if (!browserOnline) {
+    color = '#f44336'; label = 'Offline — no network';
+  } else if (ageMs === null) {
+    color = '#ff9800'; label = 'Waiting for first heartbeat…';
+  } else if (ageMs < 3 * 60 * 1000) {
+    color = '#4caf50'; label = `Heartbeat OK — ${Math.round(ageMs / 1000)}s ago`;
+  } else {
+    color = '#ff9800'; label = `Heartbeat stale — ${Math.round(ageMs / 60000)} min ago`;
+  }
+
   return (
-  <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 0.75, sm: 1 }, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1.5, flexWrap: 'wrap' }}>
-      {active === 'settings' ? (
-        <Box sx={{ display:'flex', alignItems:'center', gap: 1 }}>
-          <Tooltip title="Back to services">
-            <IconButton color="inherit" size="large" onClick={onBackToServices} aria-label="Back to services">
-              <ArrowBackIosNewIcon fontSize="medium" />
-            </IconButton>
-          </Tooltip>
-          <Box
-            component="img"
-            src="/img/logo.png"
-            alt="Kiosk ePermit"
-            sx={{ height: 50, width: 'auto', cursor: 'pointer', animation: `${pulse} 2s ease-in-out infinite` }}
-            onClick={onBackToServices}
-            role="button"
-            aria-label="Back to services"
-          />
-        </Box>
-      ) : (
-        <Typography variant="subtitle1" sx={{ opacity: 0.9, fontSize: { xs: 14, sm: 'inherit' } }}>
-          Hello, <b>Guest</b> — Welcome to <b>Kiosk ePermit</b>{siteName ? <> — <b>{siteName}</b></> : null}
-        </Typography>
-      )}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%', flexWrap:'wrap', justifyContent: { xs: 'space-between', sm: 'flex-end' } }}>
-        <Tooltip title="Settings">
-          <IconButton color="inherit" size="medium" aria-label="Open settings" onClick={onOpenSettings}>
-            <SettingsIcon />
+    <Tooltip title={label} arrow>
+      <Box
+        sx={{
+          width: 10, height: 10, borderRadius: '50%',
+          bgcolor: color,
+          flexShrink: 0,
+          boxShadow: `0 0 0 2px ${color}44`,
+          cursor: 'default',
+        }}
+        aria-label={label}
+      />
+    </Tooltip>
+  );
+}
+
+export default function TopBar({ onOpenSettings, showSettings, onBackToMain, siteName }){
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+
+  if (showSettings) {
+    return (
+      <Box sx={{ px: { xs: 1.5, sm: 2.5 }, py: { xs: 0.5, sm: 0.75 }, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Tooltip title="Back">
+          <IconButton color="inherit" size="large" onClick={onBackToMain} aria-label="Back">
+            <ArrowBackIosNewIcon fontSize="medium" />
           </IconButton>
         </Tooltip>
-        <IconButton color="inherit" size="medium" aria-label="Exit app" sx={{ ml: { xs: 'auto', sm: 0 } }}>
-          <PowerSettingsNewIcon />
-        </IconButton>
+        <Typography variant="h6" sx={{ fontWeight: 700 }}>Settings</Typography>
       </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ px: { xs: 1.5, sm: 2 }, py: { xs: 0.5, sm: 0.75 }, display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Box sx={{ position: 'relative', width: { xs: 48, sm: 60, md: 68 }, height: { xs: 48, sm: 60, md: 68 }, flexShrink: 0 }}>
+        <Image
+          src={isDark ? '/img/logo.png' : '/img/logo_light.png'}
+          alt="LDK ePERMIT"
+          layout="fill"
+          objectFit="contain"
+          priority
+        />
+      </Box>
+      <KioskStatusDot />
     </Box>
   );
 }

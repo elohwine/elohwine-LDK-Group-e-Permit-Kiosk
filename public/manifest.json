@@ -7,9 +7,13 @@
   "scope": "/",
   "lang": "en-GB",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "fullscreen", "standalone"],
+  "display_override": [
+    "window-controls-overlay",
+    "fullscreen",
+    "standalone"
+  ],
   "capture_links": "existing-client-navigate",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "dir": "ltr",
   "background_color": "#ffffff",
   "theme_color": "#1374bc",
@@ -17,9 +21,14 @@
     "preferred_width": 380,
     "rule_list": [
       {
-        "matches": ["/*"],
+        "matches": [
+          "/*"
+        ],
         "entry_points": [
-          { "title": "Assistant", "url": "/?source=sidepanel" }
+          {
+            "title": "Assistant",
+            "url": "/?source=sidepanel"
+          }
         ]
       }
     ]
@@ -36,7 +45,15 @@
       "text": "text",
       "url": "url",
       "files": [
-        { "name": "files", "accept": ["image/*", "application/*", "text/*", "*/*"] }
+        {
+          "name": "files",
+          "accept": [
+            "image/*",
+            "application/*",
+            "text/*",
+            "*/*"
+          ]
+        }
       ]
     }
   },
@@ -44,8 +61,13 @@
     {
       "action": "/open-file",
       "accept": {
-        "application/json": [".json", ".epermit"],
-        "text/plain": [".txt"]
+        "application/json": [
+          ".json",
+          ".epermit"
+        ],
+        "text/plain": [
+          ".txt"
+        ]
       },
       "launch_type": "single-client"
     }
@@ -57,12 +79,54 @@
     }
   ],
   "iarc_rating_id": "pending",
-  "categories": ["business", "utilities", "productivity"],
+  "categories": [
+    "business",
+    "utilities",
+    "productivity"
+  ],
   "icons": [
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "../icons/icon-48.webp",
+      "type": "image/png",
+      "sizes": "48x48",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "../icons/icon-72.webp",
+      "type": "image/png",
+      "sizes": "72x72",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "../icons/icon-96.webp",
+      "type": "image/png",
+      "sizes": "96x96",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "../icons/icon-128.webp",
+      "type": "image/png",
+      "sizes": "128x128",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "../icons/icon-192.webp",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "../icons/icon-256.webp",
+      "type": "image/png",
+      "sizes": "256x256",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "../icons/icon-512.webp",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
   ],
   "screenshots": [
     {
@@ -87,9 +151,24 @@
       "description": "Start a new permit application",
       "url": "/apply",
       "icons": [
-  { "src": "/icons/shortcut-96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },
-  { "src": "/icons/shortcut-96-mono.png", "sizes": "96x96", "type": "image/png", "purpose": "monochrome" },
-  { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }
+        {
+          "src": "/icons/shortcut-96.png",
+          "sizes": "96x96",
+          "type": "image/png",
+          "purpose": "any"
+        },
+        {
+          "src": "/icons/shortcut-96-mono.png",
+          "sizes": "96x96",
+          "type": "image/png",
+          "purpose": "monochrome"
+        },
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "any"
+        }
       ]
     },
     {
@@ -98,9 +177,24 @@
       "description": "Renew an existing permit",
       "url": "/renew",
       "icons": [
-  { "src": "/icons/shortcut-96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },
-  { "src": "/icons/shortcut-96-mono.png", "sizes": "96x96", "type": "image/png", "purpose": "monochrome" },
-  { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }
+        {
+          "src": "/icons/shortcut-96.png",
+          "sizes": "96x96",
+          "type": "image/png",
+          "purpose": "any"
+        },
+        {
+          "src": "/icons/shortcut-96-mono.png",
+          "sizes": "96x96",
+          "type": "image/png",
+          "purpose": "monochrome"
+        },
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "any"
+        }
       ]
     },
     {
@@ -109,9 +203,24 @@
       "description": "Scan or enter a permit to verify",
       "url": "/verify",
       "icons": [
-  { "src": "/icons/shortcut-96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },
-  { "src": "/icons/shortcut-96-mono.png", "sizes": "96x96", "type": "image/png", "purpose": "monochrome" },
-  { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }
+        {
+          "src": "/icons/shortcut-96.png",
+          "sizes": "96x96",
+          "type": "image/png",
+          "purpose": "any"
+        },
+        {
+          "src": "/icons/shortcut-96-mono.png",
+          "sizes": "96x96",
+          "type": "image/png",
+          "purpose": "monochrome"
+        },
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "any"
+        }
       ]
     }
   ],

@@ -1,211 +1,265 @@
-import { useState, useMemo, useEffect, useRef } from "react";
-import { Box, Paper, Button, IconButton } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { useState, useMemo } from "react";
+import { Box, ButtonBase } from "@mui/material";
 import BackspaceIcon from "@mui/icons-material/Backspace";
-import KeyboardHideIcon from "@mui/icons-material/KeyboardHide";
-import OpenInFullIcon from "@mui/icons-material/OpenInFull"; // undock icon
-import VerticalAlignBottomIcon from "@mui/icons-material/VerticalAlignBottom"; // dock icon
 
-export default function OnScreenKeyboard({ open, mode = "text", value = "", onChange, onClose, onSize, docked = true, position = {x:16,y:16}, size = { w: 640, h: 360 }, onToggleDock, onDrag, onResize }) {
+/**
+ * ATM-style on-screen keyboard.
+ * Always rendered inside the side panel. Uses brand navy/blue palette.
+ * Props: { mode, value, hasTarget, onChange, onNext }
+ */
+export default function OnScreenKeyboard({ isDark = true, mode = "text", value = "", hasTarget = false, onChange, onNext, onEnter }) {
   const [caps, setCaps] = useState(true);
-  const rootRef = useRef(null);
-  const heightPx = useMemo(() => {
-    const hasWindow = typeof window !== 'undefined';
-    const vh = hasWindow ? window.innerHeight : 0;
-    // More compact keyboard - reduce from 0.9 to 0.4 of viewport height
-    const target = vh ? Math.round(vh * 0.4) : Math.min(size.h, 280);
-    return Math.max(200, Math.min(size.h, target));
-  }, [size.h]);
-  const draggingRef = useRef(null);
-  const resizingRef = useRef(null);
-  const moveHandlerRef = useRef(null);
-  const upHandlerRef = useRef(null);
 
-  const rows = useMemo(() => {
-    if (mode === "number") {
-      return [
-        ["7", "8", "9"],
-        ["4", "5", "6"],
-        ["1", "2", "3"],
-        ["0", ".", "-"],
-      ];
-    }
-    const r1 = ["1","2","3","4","5","6","7","8","9","0"];
-    const r2 = ["q","w","e","r","t","y","u","i","o","p"];
-    const r3 = ["a","s","d","f","g","h","j","k","l"];
-    const r4 = ["z","x","c","v","b","n","m"];
-    return [r1, r2, r3, r4];
-  }, [mode]);
+  const qRow1 = useMemo(() => ['Q','W','E','R','T','Y','U','I','O','P'], []);
+  const qRow2 = useMemo(() => ['A','S','D','F','G','H','J','K','L'], []);
+  const qRow3 = useMemo(() => ['Z','X','C','V','B','N','M'], []);
 
-  // Ensure hooks run unconditionally before any early return
-  useEffect(()=>{
-    if (!open) return;
-    const el = rootRef.current;
-    if (!el) return;
-    const hasRO = typeof ResizeObserver !== 'undefined';
-    const ro = hasRO ? new ResizeObserver(()=>{
-      const h = el.getBoundingClientRect().height;
-      onSize?.(h);
-    }) : null;
-    ro?.observe(el);
-    // initial
-    const h = el.getBoundingClientRect().height;
-    onSize?.(h);
-  return () => ro?.disconnect();
-  }, [open, onSize]);
+  const numRows = useMemo(() => [
+    ["1","2","3"],
+    ["4","5","6"],
+    ["7","8","9"],
+    ["0",".",null],
+  ], []);
 
-  // Global pointer listeners cleanup on unmount
-  useEffect(()=>{
-    return () => {
-      if (moveHandlerRef.current) window.removeEventListener('pointermove', moveHandlerRef.current);
-      if (upHandlerRef.current) window.removeEventListener('pointerup', upHandlerRef.current);
-    };
-  },[]);
+  const apply = (ch) => { if (hasTarget) onChange?.((value || "") + ch); };
+  const backspace = () => { if (hasTarget) onChange?.((value || "").slice(0, -1)); };
+  const clear = () => { if (hasTarget) onChange?.(""); };
 
-  if (!open) return null;
+  // Brand-aligned color tokens — light/dark reactive
+  const KEY_BG        = isDark ? '#162d4a' : '#d8ecff';
+  const KEY_BG_HOVER  = isDark ? '#1c3a5f' : '#c0dfff';
+  const KEY_TEXT      = isDark ? '#e8f0fc' : '#0d2a4a';
+  const KEY_BORDER    = isDark ? 'rgba(19,116,188,0.18)' : 'rgba(19,116,188,0.3)';
+  const KEY_ACTIVE    = '#1374bc';
+  const BKSP_BG       = isDark ? '#0e1e30' : '#b8d4f4';
+  const DONE_BG       = '#1374bc';
+  const DONE_HOVER    = '#0e5fa0';
+  const CAPS_ON_BG    = '#1374bc';
+  const CAPS_OFF_BG   = isDark ? '#162d4a' : '#c8e2ff';
+  const CLEAR_BG      = isDark ? '#4a2010' : '#fff0e8';
+  const CLEAR_COLOR   = isDark ? '#ffa060' : '#e06020';
 
-  const apply = (ch) => {
-    const out = (value || "") + ch;
-    onChange?.(out);
-  };
-  const backspace = () => onChange?.((value || "").slice(0, -1));
-  const clear = () => onChange?.("");
+  const opacity = hasTarget ? 1 : 0.45;
 
-  const startGlobalTracking = () => {
-    if (moveHandlerRef.current) return; // already tracking
-    const onMove = (e) => {
-      if (draggingRef.current) {
-        const dx = e.clientX - draggingRef.current.startX;
-        const dy = e.clientY - draggingRef.current.startY;
-        draggingRef.current.startX = e.clientX;
-        draggingRef.current.startY = e.clientY;
-        onDrag?.(dx, dy);
-        return;
-      }
-      if (resizingRef.current) {
-        const dx = e.clientX - resizingRef.current.startX;
-        const dy = e.clientY - resizingRef.current.startY;
-        resizingRef.current.startX = e.clientX;
-        resizingRef.current.startY = e.clientY;
-        onResize?.(dx, dy, resizingRef.current.edge);
-        return;
-      }
-    };
-    const onUp = (e) => {
-      draggingRef.current = null;
-      resizingRef.current = null;
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-      moveHandlerRef.current = null;
-      upHandlerRef.current = null;
-    };
-    moveHandlerRef.current = onMove;
-    upHandlerRef.current = onUp;
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
+  const tileSx = {
+    borderRadius: 'clamp(5px, 0.8dvh, 9px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    bgcolor: KEY_BG,
+    color: KEY_TEXT,
+    fontWeight: 700,
+    fontSize: 'clamp(0.85rem, 2.3dvh, 1.5rem)',
+    fontFamily: "'Roboto', sans-serif",
+    letterSpacing: '0.02em',
+    border: `1px solid ${KEY_BORDER}`,
+    boxShadow: '0 2px 4px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.07)',
+    transition: 'transform 0.07s, background-color 0.1s, opacity 0.2s',
+    userSelect: 'none',
+    WebkitTapHighlightColor: 'transparent',
+    cursor: hasTarget ? 'pointer' : 'default',
+    minHeight: 'clamp(44px, 8dvh, 88px)',
+    opacity,
+    '&:active': hasTarget ? {
+      bgcolor: KEY_ACTIVE,
+      transform: 'scale(0.91)',
+      boxShadow: `0 0 0 2px ${KEY_ACTIVE}55`,
+    } : {},
   };
 
+  const bkspSx = {
+    ...tileSx,
+    bgcolor: BKSP_BG,
+    '&:active': hasTarget ? { bgcolor: '#c0392b', transform: 'scale(0.91)' } : {},
+  };
+
+  const actionSx = (variant) => ({
+    borderRadius: 'clamp(6px, 1dvh, 10px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 700,
+    letterSpacing: '0.04em',
+    fontSize: 'clamp(0.62rem, 1.5dvh, 1rem)',
+    color: variant === 'clear' ? CLEAR_COLOR : variant === 'done' || variant === 'caps' ? '#e8f0fc' : KEY_TEXT,
+    border: `1px solid ${KEY_BORDER}`,
+    boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+    userSelect: 'none',
+    WebkitTapHighlightColor: 'transparent',
+    transition: 'transform 0.07s, background-color 0.1s, opacity 0.2s',
+    cursor: hasTarget ? 'pointer' : 'default',
+    opacity,
+    minHeight: 'clamp(36px, 6dvh, 68px)',
+    ...(variant === 'done' ? {
+      bgcolor: DONE_BG,
+      border: '1px solid rgba(19,116,188,0.5)',
+      opacity: 1, // done always full opacity
+      cursor: 'pointer',
+      '&:active': { bgcolor: DONE_HOVER, transform: 'scale(0.97)' },
+    } : variant === 'caps' ? {
+      bgcolor: caps ? CAPS_ON_BG : CAPS_OFF_BG,
+      border: caps ? '1px solid rgba(19,116,188,0.5)' : '1px solid rgba(19,116,188,0.18)',
+      color: isDark ? (caps ? '#a8d4ff' : '#8099bb') : (caps ? '#ffffff' : '#1374bc'),
+      '&:active': hasTarget ? { transform: 'scale(0.97)' } : {},
+    } : variant === 'clear' ? {
+      bgcolor: CLEAR_BG,
+      border: '1px solid rgba(200,80,0,0.3)',
+      '&:active': hasTarget ? { bgcolor: '#7a3018', transform: 'scale(0.97)' } : {},
+    } : {
+      bgcolor: KEY_BG,
+      '&:active': hasTarget ? { bgcolor: KEY_BG_HOVER, transform: 'scale(0.97)' } : {},
+    }),
+  });
+
+  /* ═══ NUMBER PAD ═══ */
+  if (mode === "number") {
+    return (
+      <Box
+        data-keyboard-element="true"
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          px: 'clamp(6px, 1.2vw, 16px)',
+          py: 'clamp(4px, 0.7dvh, 12px)',
+          gap: 'clamp(4px, 0.6dvh, 12px)',
+        }}
+      >
+        {/* Numpad grid */}
+        <Box sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+          gap: 'clamp(3px, 0.45dvh, 8px)',
+        }}>
+          {numRows.flat().map((key, i) =>
+            key === null ? (
+              <ButtonBase key="bksp" data-keyboard-element="true" onClick={backspace} sx={bkspSx}>
+                <BackspaceIcon sx={{ fontSize: { xs: '1.1rem', sm: '1.4rem' } }} />
+              </ButtonBase>
+            ) : (
+              <ButtonBase key={key} data-keyboard-element="true" onClick={() => apply(key)} sx={tileSx}>
+                {key}
+              </ButtonBase>
+            )
+          )}
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 1.4fr', gap: 'clamp(3px, 0.45dvh, 8px)' }}>
+          <ButtonBase data-keyboard-element="true" onClick={clear} sx={actionSx('clear')}>
+            Clear
+          </ButtonBase>
+          <ButtonBase data-keyboard-element="true" onClick={onEnter} sx={actionSx('done')}>
+            ↵ Enter
+          </ButtonBase>
+          <ButtonBase data-keyboard-element="true" onClick={onNext} sx={actionSx('done')}>
+            Next →
+          </ButtonBase>
+        </Box>
+      </Box>
+    );
+  }
+
+  /* ═══ TEXT / ALPHA-NUMERIC — QWERTY ═══ */
+  const kbGap = 'clamp(5px, 1dvh, 14px)';
   return (
     <Box
-      ref={rootRef}
       data-keyboard-element="true"
       sx={{
-        position: 'fixed',
-        left: docked ? 0 : position.x,
-        right: docked ? 0 : 'auto',
-        bottom: docked ? 0 : 'auto',
-        top: docked ? 'auto' : position.y,
-        zIndex: (t) => t.zIndex.modal + 1,
-        maxWidth: docked ? '100vw' : 'min(100vw - 24px, 1200px)'
+        display: 'flex',
+        flex: 1,
+        gap: 'clamp(6px, 1.2vw, 18px)',
+        px: 'clamp(10px, 1.8vw, 24px)',
+        py: 'clamp(8px, 1.5dvh, 22px)',
       }}
     >
-      <Paper elevation={16} data-keyboard-element="true" sx={{ p: 1, borderTopLeftRadius: 16, borderTopRightRadius: 16, borderBottomLeftRadius: docked ? 0 : 16, borderBottomRightRadius: docked ? 0 : 16, bgcolor: 'background.paper', height: `${heightPx}px`, width: docked ? '100%' : `${size.w}px`, display:'flex', flexDirection:'column', boxSizing:'border-box', position:'relative' }}>
-        {/* Minimal header with only controls when undocked */}
-        {!docked && (
-          <Box
-            onPointerDown={(e)=>{
-              draggingRef.current = { id: e.pointerId, startX: e.clientX, startY: e.clientY };
-              startGlobalTracking();
-              try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
-            }}
-            sx={{ display:'flex', justifyContent:'flex-end', alignItems:'center', mb: 0.5, cursor: draggingRef.current ? 'grabbing' : 'grab', userSelect: 'none' }}
-          >
-            <Box>
-              <IconButton size="small" data-keyboard-element="true" onClick={onToggleDock} sx={{ mr: 0.5 }}>
-                <VerticalAlignBottomIcon fontSize="small"/>
-              </IconButton>
-              <IconButton size="small" data-keyboard-element="true" onClick={onClose}><KeyboardHideIcon fontSize="small"/></IconButton>
-            </Box>
-          </Box>
-        )}
-        {/* Docked mode: only hide button in top-right */}
-        {docked && (
-          <Box sx={{ position:'absolute', top: 8, right: 8, zIndex: 10 }}>
-            <IconButton size="small" data-keyboard-element="true" onClick={onToggleDock} sx={{ mr: 0.5, bgcolor: (t)=>alpha(t.palette.background.paper, 0.9) }}>
-              <OpenInFullIcon fontSize="small"/>
-            </IconButton>
-            <IconButton size="small" data-keyboard-element="true" onClick={onClose} sx={{ bgcolor: (t)=>alpha(t.palette.background.paper, 0.9) }}><KeyboardHideIcon fontSize="small"/></IconButton>
-          </Box>
-        )}
-        {/* keys */}
-        <Box sx={{ display:'grid', gap: 1, overflow:'auto', flex: 1 }}>
-          {rows.map((r, idx) => (
-            <Box key={idx} sx={{ display:'flex', gap: 1, justifyContent:'center' }}>
-              {mode !== 'number' && idx === 2 && (
-                <Button variant="outlined" data-keyboard-element="true" onClick={() => setCaps(!caps)} sx={{ minWidth: 80 }}>
-                  {caps ? 'Caps' : 'caps'}
-                </Button>
-              )}
-              {r.map((k) => {
-                const label = mode === 'number' ? k : (caps ? k.toUpperCase() : k);
-                return (
-                  <Button key={k} variant="contained" data-keyboard-element="true" onClick={() => apply(label)} sx={{ minWidth: 48, bgcolor: (t)=>`${t.palette.primary.main}b3` , '&:hover': { bgcolor: (t)=>`${t.palette.primary.main}cc` } }}>
-                    {label}
-                  </Button>
-                );
-              })}
-              {mode !== 'number' && idx === 2 && (
-                <IconButton color="primary" data-keyboard-element="true" onClick={backspace} sx={{ border: '1px solid', borderColor: 'divider' }}>
-                  <BackspaceIcon />
-                </IconButton>
-              )}
-              {mode === 'number' && idx === rows.length - 1 && (
-                <IconButton color="primary" data-keyboard-element="true" onClick={backspace} sx={{ border: '1px solid', borderColor: 'divider' }}>
-                  <BackspaceIcon />
-                </IconButton>
-              )}
-            </Box>
-          ))}
-          <Box sx={{ display:'flex', gap: 1, justifyContent:'center' }}>
-            {mode !== 'number' && (
-              <Button onClick={() => apply(' ')} data-keyboard-element="true" variant="outlined" sx={{ minWidth: 160, bgcolor: (t)=>`${t.palette.primary.main}4d`, borderColor: 'transparent', '&:hover': { bgcolor: (t)=>`${t.palette.primary.main}66` } }}>Space</Button>
-            )}
-            <Button color="warning" data-keyboard-element="true" onClick={clear} variant="outlined">Clear</Button>
-            <Button onClick={onClose} data-keyboard-element="true" variant="contained" sx={{ bgcolor: (t)=>`${t.palette.primary.main}b3`, '&:hover': { bgcolor: (t)=>`${t.palette.primary.main}cc` } }}>Done</Button>
-          </Box>
+      {/* ── QWERTY section ── */}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: kbGap, minWidth: 0 }}>
+        {/* Row 1: Q-P (10 keys) */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: kbGap }}>
+          {qRow1.map((k) => {
+            const label = caps ? k : k.toLowerCase();
+            return (
+              <ButtonBase key={k} data-keyboard-element="true" onClick={() => apply(label)} sx={tileSx}>
+                {label}
+              </ButtonBase>
+            );
+          })}
         </Box>
-        {/* Resize handles (visible when undocked for width, always for height if docked) */}
-        <Box
-          onPointerDown={(e)=>{ resizingRef.current = { edge: 'bottom-right', startX: e.clientX, startY: e.clientY }; startGlobalTracking(); try { e.currentTarget.setPointerCapture(e.pointerId); } catch {} }}
-          sx={{ position:'absolute', width: 18, height: 18, right: 6, bottom: 6, cursor: 'nwse-resize', border: '1px solid', borderColor: 'divider', borderRadius: 1,
-            backgroundImage: 'repeating-linear-gradient(135deg, rgba(0,0,0,0.35) 0 2px, transparent 2px 4px)',
-            bgcolor: 'action.hover',
-            '&:hover': { bgcolor: 'action.selected' }
-          }}
-          aria-label="Resize"
-          role="button"
-        />
-        {!docked && (
-          <>
-            <Box onPointerDown={(e)=>{ resizingRef.current = { edge: 'right', startX: e.clientX, startY: e.clientY }; startGlobalTracking(); try { e.currentTarget.setPointerCapture(e.pointerId); } catch {} }} sx={{ position:'absolute', top: 24, bottom: 24, right: 0, width: 12, cursor: 'ew-resize', bgcolor: 'action.hover', opacity: 0.6, '&:hover': { opacity: 1, bgcolor: 'action.selected' } }} />
-            <Box onPointerDown={(e)=>{ resizingRef.current = { edge: 'left', startX: e.clientX, startY: e.clientY }; startGlobalTracking(); try { e.currentTarget.setPointerCapture(e.pointerId); } catch {} }} sx={{ position:'absolute', top: 24, bottom: 24, left: 0, width: 12, cursor: 'ew-resize', bgcolor: 'action.hover', opacity: 0.6, '&:hover': { opacity: 1, bgcolor: 'action.selected' } }} />
-            <Box onPointerDown={(e)=>{ resizingRef.current = { edge: 'top', startX: e.clientX, startY: e.clientY }; startGlobalTracking(); try { e.currentTarget.setPointerCapture(e.pointerId); } catch {} }} sx={{ position:'absolute', top: 0, left: 24, right: 24, height: 12, cursor: 'ns-resize', bgcolor: 'action.hover', opacity: 0.6, '&:hover': { opacity: 1, bgcolor: 'action.selected' } }} />
-          </>
-        )}
-        {docked && (
-          <Box onPointerDown={(e)=>{ resizingRef.current = { edge: 'bottom', startX: e.clientX, startY: e.clientY }; startGlobalTracking(); try { e.currentTarget.setPointerCapture(e.pointerId); } catch {} }} sx={{ position:'absolute', left: 24, right: 24, bottom: 0, height: 12, cursor: 'ns-resize', bgcolor: 'action.hover', opacity: 0.6, '&:hover': { opacity: 1, bgcolor: 'action.selected' } }} />
-        )}
-      </Paper>
+
+        {/* Row 2: A-L centered (9 keys + half-key spacers each side) */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: '0.5fr repeat(9, 1fr) 0.5fr', gap: kbGap }}>
+          <Box />
+          {qRow2.map((k) => {
+            const label = caps ? k : k.toLowerCase();
+            return (
+              <ButtonBase key={k} data-keyboard-element="true" onClick={() => apply(label)} sx={tileSx}>
+                {label}
+              </ButtonBase>
+            );
+          })}
+          <Box />
+        </Box>
+
+        {/* Row 3: Z-M + ⌫ */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr repeat(7, 1fr) 1.6fr 0.4fr', gap: kbGap }}>
+          <Box />
+          {qRow3.map((k) => {
+            const label = caps ? k : k.toLowerCase();
+            return (
+              <ButtonBase key={k} data-keyboard-element="true" onClick={() => apply(label)} sx={tileSx}>
+                {label}
+              </ButtonBase>
+            );
+          })}
+          <ButtonBase data-keyboard-element="true" onClick={backspace} sx={bkspSx}>
+            <BackspaceIcon sx={{ fontSize: { xs: '1.1rem', sm: '1.3rem' } }} />
+          </ButtonBase>
+          <Box />
+        </Box>
+
+        {/* Row 4: Caps | Clear | Space | Enter | Next */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: '1.4fr 1.2fr 3fr 1.6fr 1.4fr', gap: kbGap }}>
+          <ButtonBase data-keyboard-element="true" onClick={() => setCaps(!caps)} sx={actionSx('caps')}>
+            {caps ? 'ABC' : 'abc'}
+          </ButtonBase>
+          <ButtonBase data-keyboard-element="true" onClick={clear} sx={actionSx('clear')}>
+            Clear
+          </ButtonBase>
+          <ButtonBase data-keyboard-element="true" onClick={() => apply(' ')} sx={actionSx('space')}>
+            Space
+          </ButtonBase>
+          <ButtonBase data-keyboard-element="true" onClick={onEnter} sx={actionSx('done')}>
+            ↵ Enter
+          </ButtonBase>
+          <ButtonBase data-keyboard-element="true" onClick={onNext} sx={actionSx('done')}>
+            Next →
+          </ButtonBase>
+        </Box>
+      </Box>
+
+      {/* ── Number pad ── */}
+      <Box sx={{ width: 'clamp(100px, 20vw, 160px)', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: kbGap }}>
+        {/* 7-9, 4-6, 1-3 */}
+        {[['7','8','9'],['4','5','6'],['1','2','3']].map((row, ri) => (
+          <Box key={ri} sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: kbGap }}>
+            {row.map((k) => (
+              <ButtonBase key={k} data-keyboard-element="true" onClick={() => apply(k)} sx={tileSx}>
+                {k}
+              </ButtonBase>
+            ))}
+          </Box>
+        ))}
+        {/* 0 + DELETE */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: kbGap, flex: 1 }}>
+          <ButtonBase data-keyboard-element="true" onClick={() => apply('0')} sx={tileSx}>
+            0
+          </ButtonBase>
+          <ButtonBase data-keyboard-element="true" onClick={backspace} sx={{ ...bkspSx, fontSize: 'clamp(0.6rem, 1.5dvh, 0.9rem)', fontWeight: 700 }}>
+            DELETE
+          </ButtonBase>
+        </Box>
+      </Box>
     </Box>
   );
 }

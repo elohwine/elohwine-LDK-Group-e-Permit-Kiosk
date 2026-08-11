@@ -79,7 +79,7 @@
       ]
     }
   },
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "fingerprints": [],
   "additionalTrustedOrigins": [],
   "retainedBundles": [],

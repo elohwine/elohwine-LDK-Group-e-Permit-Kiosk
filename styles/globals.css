@@ -1,11 +1,22 @@
-html, body, #__next { height: 100%; }
-body { margin: 0; }
+html, body, #__next { height: 100%; max-height: 100dvh; overflow: hidden; }
+body { margin: 0; font-family: 'Roboto', 'Roboto Condensed', system-ui, -apple-system, sans-serif; }
 
-/* When on-screen keyboard is open, add bottom inset to avoid overlap */
-body.kbd-open #__next { padding-bottom: calc(var(--kbd-inset, 0px) + env(safe-area-inset-bottom)); }
+/* Responsive base sizing — MD3 window-size-class aligned */
+html { font-size: 14px; }
+@media (min-width: 360px)  { html { font-size: 15px; } }
+@media (min-width: 600px)  { html { font-size: 16px; } }  /* MD3 Medium  (tablet portrait)  */
+@media (min-width: 840px)  { html { font-size: 17px; } }  /* MD3 Expanded (tablet landscape) */
+@media (min-width: 1200px) { html { font-size: 18px; } }  /* MD3 Large   (big tablet / desktop) */
 
-/* Ensure the app wrapper can scroll when the keyboard takes space */
-/* Let pages manage overflow; containers handle their own scroll */
+/* Compact spacing for short viewports (landscape phones) */
+@media (max-height: 500px) {
+  html { font-size: 13px; }
+}
+/* Landscape tablets with limited height — prevent over-scaling */
+@media (min-width: 600px) and (max-height: 500px) {
+  html { font-size: 14px; }
+}
+
 #__next { overflow: hidden; }
 
 /* Improve motion & scrolling */

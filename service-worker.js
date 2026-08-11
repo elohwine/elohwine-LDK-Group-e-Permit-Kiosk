@@ -75,10 +75,24 @@ registerRoute(
   new StaleWhileRevalidate({ cacheName: 'assets' })
 );
 
-// API GET caching
+// API GET caching (Next.js API routes)
 registerRoute(
   ({ url, request }) => request.method === 'GET' && url.pathname.startsWith('/api/'),
   new NetworkFirst({ cacheName: 'api-get', networkTimeoutSeconds: 5 })
+);
+
+// Backend-proxy GET caching (browser mode: /backend-api/* → real backend)
+// Caches permit lookup responses so VRM lookups work offline
+registerRoute(
+  ({ url, request }) => request.method === 'GET' && url.pathname.startsWith('/backend-api/'),
+  new NetworkFirst({
+    cacheName: 'backend-api-get',
+    networkTimeoutSeconds: 5,
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [200] }),
+      new ExpirationPlugin({ maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 }), // 24h
+    ],
+  })
 );
 
 // Background Sync for mutating API requests
@@ -87,7 +101,7 @@ const permitQueue = new BackgroundSyncPlugin('permit-queue', {
 });
 
 registerRoute(
-  ({ url, request }) => ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method) && url.pathname.startsWith('/api/'),
+  ({ url, request }) => ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method) && (url.pathname.startsWith('/api/') || url.pathname.startsWith('/backend-api/')),
   new NetworkOnly({ plugins: [permitQueue] }),
   'POST'
 );

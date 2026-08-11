@@ -29,7 +29,7 @@ const BotAvatar = () => {
   const primary = useLottieAsset('/lottie/Robotchat.json');
   const botAnim = primary;
   return (
-    <Box sx={{ width: 32, height: 32, borderRadius: '50%', overflow:'hidden', boxShadow: (t)=>`0 0 10px ${t.palette.primary.main}44`, bgcolor: (t)=>`${t.palette.background.paper}`, flexShrink: 0 }}>
+    <Box sx={{ width: { xs: 32, sm: 40 }, height: { xs: 32, sm: 40 }, borderRadius: '50%', overflow:'hidden', boxShadow: (t)=>`0 0 10px ${t.palette.primary.main}44`, bgcolor: (t)=>`${t.palette.background.paper}`, flexShrink: 0 }}>
       {botAnim ? (
         <Lottie autoplay loop animationData={botAnim} style={{ width: '100%', height: '100%' }} />
       ) : (
@@ -218,7 +218,7 @@ export default function ManagerAssistant({ settings, onUpdate, onSave }) {
           {history.map((m, i) => (
             <Box key={i} sx={{ display: 'flex', mb: 1.25, justifyContent: m.side === 'user' ? 'flex-end' : 'flex-start', alignItems: 'flex-end', gap: 1 }}>
               {m.side !== 'user' && <BotAvatar />}
-              <Box sx={{ maxWidth: '80%', bgcolor: (t)=> m.side==='user' ? alpha(t.palette.primary.main, 0.15) : alpha(t.palette.background.paper, 0.7), border: (t)=>`1px solid ${alpha(t.palette.divider, 0.4)}`, px: 1.25, py: 0.75, borderRadius: 2 }}>
+              <Box sx={{ maxWidth: { xs: '85%', sm: '78%', md: '72%' }, bgcolor: (t)=> m.side==='user' ? alpha(t.palette.primary.main, 0.15) : alpha(t.palette.background.paper, 0.7), border: (t)=>`1px solid ${alpha(t.palette.divider, 0.4)}`, px: 1.25, py: 0.75, borderRadius: 2 }}>
                 <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{m.text}</Typography>
               </Box>
             </Box>
@@ -243,7 +243,7 @@ function HeaderWithLottie({ onReset }) {
   return (
     <Box sx={{ display:'flex', alignItems:'center', justifyContent:'center', mb: 1, flexShrink: 0, position:'relative' }}>
       <Box sx={{ display:'flex', alignItems:'center', flexDirection:'column', gap: 0.75 }}>
-        <Box sx={{ width: 88, height: 88, borderRadius: '50%', overflow:'hidden', boxShadow: (t)=>`0 0 24px ${t.palette.primary.main}66`, bgcolor: (t)=>`${t.palette.background.paper}`, flexShrink: 0 }}>
+        <Box sx={{ width: { xs: 80, sm: 100, md: 112 }, height: { xs: 80, sm: 100, md: 112 }, borderRadius: '50%', overflow:'hidden', boxShadow: (t)=>`0 0 24px ${t.palette.primary.main}66`, bgcolor: (t)=>`${t.palette.background.paper}`, flexShrink: 0 }}>
           {headerAnim ? (
             <Lottie autoplay loop animationData={headerAnim} style={{ width: '100%', height: '100%' }} />
           ) : (

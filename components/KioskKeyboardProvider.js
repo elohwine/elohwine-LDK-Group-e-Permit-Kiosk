@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { Box, Fab, Portal } from "@mui/material";
-import KeyboardHideIcon from "@mui/icons-material/KeyboardHide";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Box, Typography, useTheme } from "@mui/material";
+import KeyboardIcon from "@mui/icons-material/Keyboard";
 import OnScreenKeyboard from "./OnScreenKeyboard";
-import { getSettings } from "../lib/permits";
 
 function setNativeValue(element, value) {
   const { set: valueSetter } = Object.getOwnPropertyDescriptor(element, 'value') || {};
@@ -17,100 +16,80 @@ function setNativeValue(element, value) {
   }
 }
 
-export default function KioskKeyboardProvider(){
-  const [open, setOpen] = useState(false);
+export default function KioskKeyboardProvider({ children }) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+
+  // Always stacked: keyboard sits below content on all devices (APT-kiosk style)
+  const isWideLandscape = false;
+
+  // Theme-driven panel tokens
+  const rootBg = isDark
+    ? 'radial-gradient(1200px 600px at 20% 0%, #2a303c 0%, #1b202a 40%, #121621 100%)'
+    : 'radial-gradient(1200px 600px at 20% 0%, #f2f7ff 0%, #e6f0ff 35%, #d6e8ff 65%, #cce2ff 100%)';
+  const panelBg = isDark
+    ? 'linear-gradient(170deg, #0d1e35 0%, #0f2444 60%, #091520 100%)'
+    : 'linear-gradient(170deg, #eaf3ff 0%, #ddeeff 55%, #cfe5ff 100%)';
+  const panelBorder = isDark ? 'rgba(19,116,188,0.22)' : 'rgba(19,116,188,0.3)';
+  const headerBg = isDark ? 'rgba(19,116,188,0.09)' : 'rgba(19,116,188,0.07)';
+  const headerBorder = isDark ? 'rgba(19,116,188,0.16)' : 'rgba(19,116,188,0.18)';
+  const panelShadow = isDark
+    ? '0 8px 40px rgba(0,0,0,0.55), 0 2px 10px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)'
+    : '0 8px 32px rgba(19,116,188,0.18), 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)';
+
   const [mode, setMode] = useState('text');
   const [value, setValue] = useState('');
-  const [docked, setDocked] = useState(true);
-  const [pos, setPos] = useState({ x: 16, y: 16 });
-  const [size, setSize] = useState({ w: 640, h: 280 });
-  const [showFabPos, setShowFabPos] = useState(null); // {x,y}
-  const showFabRef = useRef(null);
-  const dragFabRef = useRef(null);
+  const [hasTarget, setHasTarget] = useState(false);
   const targetRef = useRef(null);
-  const settingsRef = useRef({ kioskKeyboardEnabled: false, kioskKeyboardAutoOpen: true });
+  const panelRef = useRef(null);
 
-  // Load settings once and whenever storage changes (simple sync)
-  useEffect(()=>{
-    (async ()=>{ settingsRef.current = await getSettings(); })();
-    const onStorage = async (e) => {
-      if (e.key === 'settings') settingsRef.current = await getSettings();
-    };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  },[]);
-
-  // Load persisted Show FAB position
-  useEffect(()=>{
-    try {
-      const raw = localStorage.getItem('kbdShowFabPos');
-      if (raw) {
-        const p = JSON.parse(raw);
-        if (p && typeof p.x === 'number' && typeof p.y === 'number') setShowFabPos(p);
-      }
-    } catch {}
-  },[]);
-
-  // Start hidden by default; only open when a text input receives focus
-  useEffect(()=>{
-    setOpen(false);
-    try { document.documentElement.style.setProperty('--kbd-inset', '0px'); } catch {}
-  },[]);
-
-  useEffect(()=>{
-    const handler = (ev) => {
-  const s = settingsRef.current || {};
+  useEffect(() => {
+    const onFocusIn = (ev) => {
       const el = ev.target;
       if (!el) return;
-      if (el.dataset && el.dataset.kioskKbd === 'off') return; // opt-out
+      if (el.dataset?.kioskKbd === 'off') return;
       const tag = el.tagName;
       if (tag !== 'INPUT' && tag !== 'TEXTAREA' && !el.isContentEditable) return;
-      // Determine mode
       const inputType = (el.type || '').toLowerCase();
       const im = (el.inputMode || '').toLowerCase();
       const numeric = inputType === 'number' || im === 'numeric' || im === 'decimal';
+
+      // Suppress Android system keyboard by setting inputMode="none"
+      if (!el._origInputMode) el._origInputMode = el.inputMode || '';
+      el.inputMode = 'none';
+
       targetRef.current = el;
       setMode(numeric ? 'number' : 'text');
-      const currentValue = tag === 'INPUT' || tag === 'TEXTAREA' ? el.value : el.textContent || '';
-      setValue(currentValue);
-  // Auto-open when an input is focused (keyboard is hidden by default until focus)
-  setOpen(true);
+      setValue(tag === 'INPUT' || tag === 'TEXTAREA' ? el.value : el.textContent || '');
+      setHasTarget(true);
     };
+
     const onFocusOut = (ev) => {
-      // Use a small delay to check if focus moved to keyboard buttons
       setTimeout(() => {
-        const el = ev.relatedTarget || document.activeElement;
-        if (!el) { setOpen(false); return; }
-        
-        // Check if focus moved to keyboard or its buttons
-        const isKeyboardElement = el.closest('[data-keyboard-element]') || 
-                                  el.closest('.MuiPaper-root') && el.closest('[role="button"]');
-        if (isKeyboardElement) return; // Don't close if focus is on keyboard
-        
-        const tag = el.tagName;
-        const isEditable = tag === 'INPUT' || tag === 'TEXTAREA' || el.isContentEditable;
-        if (!isEditable) setOpen(false);
+        const active = document.activeElement;
+        if (!active) { targetRef.current = null; setHasTarget(false); setArrowY(null); return; }
+        if (active.closest?.('[data-keyboard-element]')) return;
+        const tag = active.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || active.isContentEditable) return;
+        // Restore original inputMode when leaving the field
+        if (targetRef.current && targetRef.current._origInputMode !== undefined) {
+          targetRef.current.inputMode = targetRef.current._origInputMode;
+          delete targetRef.current._origInputMode;
+        }
+        targetRef.current = null;
+        setHasTarget(false);
       }, 50);
     };
-    document.addEventListener('focusin', handler);
-    document.addEventListener('focusout', onFocusOut);
-    const onKeyDown = (e) => {
-      // Check keyboard open state directly to avoid stale closure
-      if (e.key === 'Enter' && !e.isComposing) {
-        // Close keyboard and blur target; allow form submit to proceed
-        setOpen(false);
-        try { targetRef.current?.blur?.(); } catch {}
-      }
-    };
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('focusin', handler);
-      document.removeEventListener('focusout', onFocusOut);
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  },[open]);
 
-  const handleChange = (v) => {
+    document.addEventListener('focusin', onFocusIn);
+    document.addEventListener('focusout', onFocusOut);
+    return () => {
+      document.removeEventListener('focusin', onFocusIn);
+      document.removeEventListener('focusout', onFocusOut);
+    };
+  }, []);
+
+  const handleChange = useCallback((v) => {
     setValue(v);
     const el = targetRef.current;
     if (!el) return;
@@ -121,167 +100,146 @@ export default function KioskKeyboardProvider(){
       el.dispatchEvent(new Event('input', { bubbles: true }));
       el.dispatchEvent(new Event('change', { bubbles: true }));
     }
-  };
+  }, []);
 
-  // Expose a simple layout hint so pages can add bottom padding
-  useEffect(()=>{
-    const root = document.documentElement;
-    if (open) {
-      document.body.classList.add('kbd-open');
-      // Enhanced scroll behavior to keep focused element visible
-      setTimeout(()=>{
-        try { 
-          const el = targetRef.current;
-          if (el) {
-            // Get keyboard height and ensure element is visible above it
-            const kbdHeight = parseInt(root.style.getPropertyValue('--kbd-inset') || '0');
-            const rect = el.getBoundingClientRect();
-            const viewportHeight = window.innerHeight;
-            const availableHeight = viewportHeight - kbdHeight;
-            
-            // If element is below the available area, scroll it into view
-            if (rect.bottom > availableHeight) {
-              el.scrollIntoView({ 
-                block: 'center', 
-                behavior: 'smooth',
-                inline: 'nearest'
-              });
-            }
-          }
-        } catch {}
-      }, 100);
-    } else {
-      root.style.setProperty('--kbd-inset', '0px');
-      document.body.classList.remove('kbd-open');
+  // Auto-focus first visible input whenever no field is active
+  useEffect(() => {
+    if (hasTarget) return;
+    const timer = setTimeout(() => {
+      const active = document.activeElement;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
+      const inputs = Array.from(document.querySelectorAll(
+        'input:not([disabled]):not([type="hidden"]):not([data-kiosk-kbd="off"]), textarea:not([disabled])'
+      )).filter(el => {
+        const rect = el.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      });
+      if (inputs[0]) inputs[0].focus();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [hasTarget]);
+
+  // "Next" advances to the next input instead of closing keyboard
+  const handleNext = useCallback(() => {
+    const el = targetRef.current;
+    const inputs = Array.from(document.querySelectorAll(
+      'input:not([disabled]):not([type="hidden"]):not([data-kiosk-kbd="off"]), textarea:not([disabled])'
+    ));
+    const idx = inputs.indexOf(el);
+    const next = inputs[idx + 1];
+    if (next) {
+      next.focus();
+    } else if (el) {
+      el.blur();
     }
-  }, [open]);
+  }, []);
 
-  const onKeyboardSize = (h) => {
-    // Only push layout when docked at bottom
-    document.documentElement.style.setProperty('--kbd-inset', docked ? `${Math.ceil(h)}px` : '0px');
-  };
-
-  const handleToggleDock = () => {
-    setDocked(prev => !prev);
-    // Reset inset when undocking
-    if (docked) document.documentElement.style.setProperty('--kbd-inset', '0px');
-  };
-
-  const handleDrag = (dx, dy) => {
-    setPos(p => ({ x: Math.max(8, Math.min(window.innerWidth - 280, p.x + dx)), y: Math.max(8, Math.min(window.innerHeight - 120, p.y + dy)) }));
-  };
-
-  const handleResize = (dx, dy, edge) => {
-    setSize(s => {
-      let { w, h } = s;
-      if (edge.includes('right')) w += dx;
-      if (edge.includes('left')) { w -= dx; setPos(p=>({ ...p, x: p.x + dx })); }
-      if (edge.includes('bottom')) h += dy;
-      if (edge.includes('top')) { h -= dy; setPos(p=>({ ...p, y: p.y + dy })); }
-      w = Math.max(360, Math.min(w, window.innerWidth - 16));
-      h = Math.max(240, Math.min(h, window.innerHeight - 16));
-      return { w, h };
-    });
-  };
+  // "Enter" dispatches a keyboard Enter event and submits the nearest form
+  const handleEnter = useCallback(() => {
+    const el = targetRef.current;
+    if (!el) return;
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, bubbles: true, cancelable: true }));
+    el.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', keyCode: 13, bubbles: true }));
+    const form = el.closest?.('form');
+    if (form) {
+      const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+      if (submitBtn) submitBtn.click();
+      else form.requestSubmit?.();
+    }
+  }, []);
 
   return (
-    <>
-      <OnScreenKeyboard
-        open={open}
-        mode={mode}
-        value={value}
-        onChange={handleChange}
-        onClose={()=>setOpen(false)}
-        onSize={onKeyboardSize}
-        docked={docked}
-        position={pos}
-  size={size}
-        onToggleDock={handleToggleDock}
-  onDrag={handleDrag}
-  onResize={handleResize}
-      />
-      {open && (
-        <Fab
-          color="primary"
-          variant="extended"
-          onClick={()=>setOpen(false)}
-          sx={{ position:'fixed', right:16, bottom: docked ? 'calc(var(--kbd-inset, 0px) + 16px)' : 16, zIndex: (t)=>t.zIndex.modal + 2, bgcolor:(t)=>`${t.palette.primary.main}b3`, '&:hover':{ bgcolor:(t)=>`${t.palette.primary.main}cc` } }}
-        >
-          <KeyboardHideIcon sx={{ mr: 1 }} /> Hide keyboard
-        </Fab>
-      )}
-      {!open && (
-        <Portal>
-        <Box
-          ref={showFabRef}
-          onPointerDown={(e)=>{
-            const el = showFabRef.current;
-            if (!el) return;
-            const rect = el.getBoundingClientRect();
-            dragFabRef.current = {
-              id: e.pointerId,
-              offsetX: e.clientX - rect.left,
-              offsetY: e.clientY - rect.top,
-              w: rect.width,
-              h: rect.height
-            };
-            try { el.setPointerCapture(e.pointerId); } catch {}
-          }}
-          onPointerMove={(e)=>{
-            if (!dragFabRef.current) return;
-            const vw = window.innerWidth;
-            const vh = window.innerHeight;
-            const w = dragFabRef.current.w;
-            const h = dragFabRef.current.h;
-            let x = e.clientX - dragFabRef.current.offsetX;
-            let y = e.clientY - dragFabRef.current.offsetY;
-            x = Math.max(8, Math.min(x, vw - w - 8));
-            y = Math.max(8, Math.min(y, vh - h - 8));
-            setShowFabPos({ x, y });
-          }}
-          onPointerUp={(e)=>{
-            if (!dragFabRef.current) return;
-            try { showFabRef.current?.releasePointerCapture(dragFabRef.current.id); } catch {}
-            // Persist using actual rect to avoid stale state
-            try {
-              const rect = showFabRef.current?.getBoundingClientRect();
-              if (rect) {
-                const vw = window.innerWidth;
-                const w = rect.width;
-                const leftSnap = 8;
-                const rightSnap = vw - w - 8;
-                const snapX = (rect.left < vw/2) ? leftSnap : rightSnap;
-                const y = Math.max(8, Math.min(rect.top, window.innerHeight - rect.height - 8));
-                setShowFabPos({ x: snapX, y });
-                localStorage.setItem('kbdShowFabPos', JSON.stringify({ x: snapX, y }));
-              }
-            } catch {}
-            dragFabRef.current = null;
-          }}
-          sx={{
-            position:'fixed',
-            left: showFabPos ? `${showFabPos.x}px` : 'auto',
-            top: showFabPos ? `${showFabPos.y}px` : 'auto',
-            right: showFabPos ? 'auto' : 16,
-            bottom: showFabPos ? 'auto' : 16,
-            zIndex: (t)=>t.zIndex.modal + 2,
-            cursor: dragFabRef.current ? 'grabbing' : 'grab',
-            touchAction: 'none'
-          }}
-          aria-label="Show on-screen keyboard"
-        >
-          <Fab
-            color="primary"
-            variant="extended"
-            onClick={()=>setOpen(true)}
-            sx={{ bgcolor:(t)=>`${t.palette.primary.main}b3`, opacity: showFabPos ? 0.9 : 1, '&:hover':{ bgcolor:(t)=>`${t.palette.primary.main}cc`, opacity: 1 } }}
-          >
-            {/* Reuse hide icon flipped to suggest show, or could use keyboard icon if added */}
-            <KeyboardHideIcon sx={{ mr: 1, transform: 'scaleY(-1)' }} /> Show keyboard
-          </Fab>
+    <Box sx={{
+      display: 'flex',
+      height: '100%',
+      minHeight: 0,
+      flexDirection: isWideLandscape ? 'row' : 'column',
+      overflow: 'hidden',
+      background: rootBg,
+    }}>
+      {/* App content — scrollable so keyboard panel never clips it */}
+      <Box sx={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+        {children}
+      </Box>
+
+      {/* Keyboard panel — flat, full-width, fills all remaining height */}
+      <Box
+        data-keyboard-element="true"
+        ref={panelRef}
+        sx={{
+          flexShrink: 0,
+          position: 'relative',
+          width: '100%',
+          flex: '0 0 auto',
+          alignSelf: 'stretch',
+          mx: 0,
+          mt: 0,
+          mb: 0,
+          borderRadius: 0,
+          background: panelBg,
+          border: 'none',
+          borderTop: `1px solid ${panelBorder}`,
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 -4px 24px rgba(0,0,0,0.28)',
+          overflow: 'hidden',
+        }}
+      >
+
+        {/* Inner clipping wrapper */}
+        <Box sx={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+        {/* Header strip */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.625,
+          px: { xs: 1.25, sm: 1.5 },
+          py: { xs: 0.375, sm: 0.625 },
+          borderBottom: `1px solid ${headerBorder}`,
+          bgcolor: headerBg,
+          flexShrink: 0,
+        }}>
+          <KeyboardIcon sx={{ fontSize: '0.8rem', color: hasTarget ? '#1374bc' : isDark ? 'rgba(255,255,255,0.22)' : 'rgba(19,116,188,0.35)', transition: 'color 0.25s' }} />
+          <Typography sx={{
+            fontSize: '0.625rem',
+            fontWeight: 700,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: hasTarget
+              ? isDark ? 'rgba(255,255,255,0.72)' : '#1374bc'
+              : isDark ? 'rgba(255,255,255,0.22)' : 'rgba(19,116,188,0.38)',
+            transition: 'color 0.25s',
+          }}>
+            {hasTarget ? 'Keyboard Active' : 'Tap a field to type'}
+          </Typography>
+          {hasTarget && (
+            <Box sx={{
+              ml: 'auto',
+              width: 5,
+              height: 5,
+              borderRadius: '50%',
+              bgcolor: '#1374bc',
+              boxShadow: '0 0 5px #1374bc',
+              animation: 'kbdpulse 1.8s ease-in-out infinite',
+              '@keyframes kbdpulse': {
+                '0%,100%': { opacity: 1, transform: 'scale(1)' },
+                '50%': { opacity: 0.35, transform: 'scale(0.7)' },
+              },
+            }} />
+          )}
         </Box>
-        </Portal>
-      )}
-    </>
+
+        <OnScreenKeyboard
+          isDark={isDark}
+          mode={mode}
+          value={value}
+          hasTarget={hasTarget}
+          onChange={handleChange}
+          onNext={handleNext}
+          onEnter={handleEnter}
+        />
+        </Box>{/* end inner clip */}
+      </Box>{/* end panel */}
+    </Box>
   );
 }

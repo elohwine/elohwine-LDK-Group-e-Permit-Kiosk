@@ -38,7 +38,7 @@ const BotAvatar = () => {
   const primary = useLottieAsset('/lottie/Robotchat.json');
   const botAnim = primary; // no header fallbacks to avoid matching header
   return (
-    <Box sx={{ width: 36, height: 36, borderRadius: '50%', overflow:'hidden', boxShadow: (t)=>`0 0 12px ${t.palette.primary.main}55`, bgcolor: (t)=>`${t.palette.background.paper}` }}>
+    <Box sx={{ width: { xs: 36, sm: 44 }, height: { xs: 36, sm: 44 }, borderRadius: '50%', overflow:'hidden', boxShadow: (t)=>`0 0 12px ${t.palette.primary.main}55`, bgcolor: (t)=>`${t.palette.background.paper}` }}>
       {botAnim ? (
         <Lottie autoplay loop animationData={botAnim} style={{ width: '100%', height: '100%' }} />
       ) : (
@@ -55,13 +55,13 @@ const TypingIndicator = () => {
   return (
     <Box sx={{ display:'flex', alignItems:'center', gap:1 }}>
       {typingAnim ? (
-        <Lottie autoplay loop animationData={typingAnim} style={{ width: 36, height: 36 }} />
+        <Lottie autoplay loop animationData={typingAnim} style={{ width: '2.25rem', height: '2.25rem' }} />
       ) : (
-        <Box sx={{ width:36, height:36, display:'grid', placeItems:'center' }}>
+        <Box sx={{ width: '2.25rem', height: '2.25rem', display:'grid', placeItems:'center' }}>
           <Box sx={{ display:'flex', gap:0.5 }}>
-            <Box sx={{ width:6, height:6, borderRadius:'50%', bgcolor:(t)=>`${t.palette.primary.main}99` }} />
-            <Box sx={{ width:6, height:6, borderRadius:'50%', bgcolor:(t)=>`${t.palette.primary.main}66` }} />
-            <Box sx={{ width:6, height:6, borderRadius:'50%', bgcolor:(t)=>`${t.palette.primary.main}33` }} />
+            <Box sx={{ width: 7, height: 7, borderRadius:'50%', bgcolor:(t)=>`${t.palette.primary.main}99` }} />
+            <Box sx={{ width: 7, height: 7, borderRadius:'50%', bgcolor:(t)=>`${t.palette.primary.main}66` }} />
+            <Box sx={{ width: 7, height: 7, borderRadius:'50%', bgcolor:(t)=>`${t.palette.primary.main}33` }} />
           </Box>
         </Box>
       )}
@@ -222,9 +222,15 @@ export default function PermitChatAssistant(){
         const res = await issuePermit({ vrm, hours, email });
         clearBotTyping();
         markLastUserDelivered();
-        append({ side:'bot', text:`Done! Permit ${res.permit.id} issued for ${vrm}.` });
-        setDlgType('success');
-        setDlgMsg('Permit issued successfully');
+        if (res.online === false) {
+          append({ side:'bot', text:`Permit saved offline for ${vrm}. It will sync to the server when connected — it has not been confirmed yet.` });
+          setDlgType('warning');
+          setDlgMsg('Permit saved offline – not yet confirmed by server');
+        } else {
+          append({ side:'bot', text:`Done! Permit ${res.permit.id} issued for ${vrm}.` });
+          setDlgType('success');
+          setDlgMsg('Permit issued successfully');
+        }
         setDlgDetails({ id: res.permit.id, vrm, siteId: res.permit.siteId, start: res.permit.start, end: res.permit.end });
         setDlgOpen(true);
         setStage('done');
@@ -260,9 +266,15 @@ export default function PermitChatAssistant(){
   const res = await issuePermit({ vrm: existing.vrm, hours, email: existing.email });
       clearBotTyping();
       markLastUserDelivered();
-  append({ side:'bot', text:`Renewed: new permit ${res.permit.id} for ${existing.vrm}.` });
-  setDlgType('success');
-  setDlgMsg('Permit renewed successfully');
+  if (res.online === false) {
+    append({ side:'bot', text:`Permit renewed offline for ${existing.vrm}. It will sync when connected.` });
+    setDlgType('warning');
+    setDlgMsg('Permit renewed offline – not yet confirmed by server');
+  } else {
+    append({ side:'bot', text:`Renewed: new permit ${res.permit.id} for ${existing.vrm}.` });
+    setDlgType('success');
+    setDlgMsg('Permit renewed successfully');
+  }
   setDlgDetails({ id: res.permit.id, vrm: existing.vrm, siteId: res.permit.siteId, start: res.permit.start, end: res.permit.end });
   setDlgOpen(true);
       setStage('done');
@@ -271,7 +283,7 @@ export default function PermitChatAssistant(){
     } else if (stage==='verify_vrm') {
       const vrm = val;
       addBotTyping();
-      const list = await getPermitsByVRM(vrm);
+      const { permits: list } = await getPermitsByVRM(vrm);
       clearBotTyping();
       if (!list || !list.length) { 
         append({ side:'bot', text:`No permits found for ${vrm}.` });
@@ -337,7 +349,7 @@ export default function PermitChatAssistant(){
     {/* Header: centered icon with title below */}
         <Box sx={{ display:'flex', alignItems:'center', justifyContent:'center', mb: 1, flexShrink: 0, position: 'relative' }}>
           <Box sx={{ display:'flex', alignItems:'center', flexDirection:'column', gap: 0.75 }}>
-      <Box sx={{ width: 88, height: 88, borderRadius: '50%', overflow:'hidden', boxShadow: (t)=>`0 0 24px ${t.palette.primary.main}66`, bgcolor: (t)=>`${t.palette.background.paper}`, flexShrink: 0 }}>
+      <Box sx={{ width: { xs: 80, sm: 100, md: 112 }, height: { xs: 80, sm: 100, md: 112 }, borderRadius: '50%', overflow:'hidden', boxShadow: (t)=>`0 0 24px ${t.palette.primary.main}66`, bgcolor: (t)=>`${t.palette.background.paper}`, flexShrink: 0 }}>
               {headerAnim ? (
                 <Lottie autoplay loop animationData={headerAnim} style={{ width: '100%', height: '100%' }} />
               ) : (
@@ -374,7 +386,7 @@ export default function PermitChatAssistant(){
             {history.map((m, idx) => (
               <Box key={m.id || idx} component={motion.div} initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ type:'spring', stiffness:180, damping:18 }} sx={{ display:'flex', mb:1.25, alignItems:'flex-end', justifyContent: m.side==='user' ? 'flex-end' : 'flex-start', gap:1 }}>
                 {m.side==='bot' && <BotAvatar/>}
-                <Box sx={{ maxWidth:'72%', display:'flex', flexDirection:'column', alignItems: m.side==='user' ? 'flex-end' : 'flex-start' }}>
+                <Box sx={{ maxWidth: { xs: '80%', sm: '72%', md: '65%' }, display:'flex', flexDirection:'column', alignItems: m.side==='user' ? 'flex-end' : 'flex-start' }}>
                   <Paper elevation={0} sx={{ px:1.25, py:0.75, borderRadius:2, bgcolor: m.side==='user' ? (t)=>alpha(t.palette.primary.main, 0.15) : (t)=>alpha(t.palette.background.paper, 0.7), border: (t)=>`1px solid ${alpha(t.palette.divider, 0.4)}` }}>
                     {m.type==='typing' && (
                       <TypingIndicator />
@@ -386,12 +398,12 @@ export default function PermitChatAssistant(){
                       <Box sx={{ textAlign:'center' }}>
                         <Typography variant="body2" sx={{ mb: 1 }}>Scan this QR to view the permit</Typography>
                         <Box sx={{ display:'grid', placeItems:'center' }}>
-                          <img src={m.text} alt="Permit QR" style={{ width: 200, height: 200 }} />
+                          <img src={m.text} alt="Permit QR" style={{ width: '100%', maxWidth: 240, height: 'auto', aspectRatio: '1' }} />
                         </Box>
                       </Box>
                     )}
                     {m.type==='card' && (
-                      <Box sx={{ width: 320, maxWidth: '80vw' }}>
+                      <Box sx={{ width: { xs: 300, sm: 360, md: 420 }, maxWidth: '80vw' }}>
                         {m.text}
                       </Box>
                     )}

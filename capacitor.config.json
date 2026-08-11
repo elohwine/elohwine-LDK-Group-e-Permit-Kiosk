@@ -3,7 +3,15 @@
   "appName": "Kiosk E-Permit",
   "webDir": "out",
   "bundledWebRuntime": false,
+  "server": {
+    "allowNavigation": [
+      "ldk-group-ltd-website-react-l2km.onrender.com"
+    ]
+  },
   "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    },
     "SplashScreen": {
       "launchShowDuration": 0,
       "backgroundColor": "#1374bc",

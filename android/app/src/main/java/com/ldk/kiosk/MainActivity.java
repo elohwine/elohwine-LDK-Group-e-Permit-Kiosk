@@ -1,5 +1,6 @@
 package com.ldk.kiosk;
 
+import android.app.admin.DevicePolicyManager;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -10,6 +11,8 @@ import com.getcapacitor.BridgeActivity;
 public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Register native Capacitor plugins BEFORE super.onCreate
+        registerPlugin(KioskPlugin.class);
         super.onCreate(savedInstanceState);
 
         getWindow().getDecorView().setSystemUiVisibility(
@@ -38,5 +41,21 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onBackPressed() {
         // Disable hardware back for kiosk
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        DevicePolicyManager dpm = getSystemService(DevicePolicyManager.class);
+        if (dpm != null && dpm.isLockTaskPermitted(getPackageName())) {
+            try {
+                startLockTask();
+            } catch (IllegalArgumentException ignored) {
+                // Activity is not in foreground yet.
+            } catch (IllegalStateException ignored) {
+                // Lock task is already active.
+            }
+        }
     }
 }

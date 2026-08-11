@@ -6,7 +6,7 @@ android {
 
     signingConfigs {
             release {
-                storeFile file("/home/eloh/kiosk-epermit-mui-v5/android.keystore")
+                storeFile file("/home/eloh/PROJECTS/elohwine-LDK-Group-e-Permit-Kiosk/android.keystore")
                 storePassword "developer123"
                 keyAlias "android"
                 keyPassword "developer123"

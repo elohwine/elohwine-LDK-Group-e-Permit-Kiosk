@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Box } from '@mui/material';
 
 // Tries multiple logo paths and renders the first that loads; otherwise renders nothing.
-export default function BrandWatermark({ paths = [ '/img/logo.png', '/img/logo.svg', '/img/logo.jpg'], maxSize = 360, opacity = 0.3, center = true }){
+export default function BrandWatermark({ paths = [ '/img/logo.png', '/img/logo.svg', '/img/logo.jpg'], maxSize = 420, opacity = 0.3, center = true }){
   const [src, setSrc] = useState(null);
   const triedRef = useRef({});
 
@@ -35,7 +35,7 @@ export default function BrandWatermark({ paths = [ '/img/logo.png', '/img/logo.s
   if (center) {
     return (
       <Box aria-hidden sx={{ position:'absolute', inset:0, display:'grid', placeItems:'center', pointerEvents:'none', zIndex: 0 }}>
-        <Box sx={{ width: maxSize, maxWidth: '60vw', aspectRatio: '1 / 1' }}>
+        <Box sx={{ width: maxSize, maxWidth: '55vw', aspectRatio: '1 / 1' }}>
           {Img}
         </Box>
       </Box>

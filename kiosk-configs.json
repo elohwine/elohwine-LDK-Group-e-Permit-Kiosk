@@ -1,0 +1,121 @@
+{
+  "selwyn-court": {
+    "siteId": "JG9lWJexQH8Qf4Bk55ff",
+    "siteName": "Selwyn Court",
+    "kioskName": "Selwyn Court",
+    "kioskId": "OVngedd8QX32ho4XDj0F",
+    "appLabel": "Selwyn Court Kiosk",
+    "defaultHours": 24,
+    "expiryMode": ""
+  },
+  "btp-phoenix": {
+    "siteId": "qLDA4aLQO0b9NKNHqjc3",
+    "siteName": "Phoenix House",
+    "kioskName": "BTP - Phoenix House",
+    "kioskId": "b91YkgEQsf4n7E1u0q89",
+    "appLabel": "BTP Phoenix Kiosk",
+    "defaultHours": 24,
+    "expiryMode": ""
+  },
+  "energic-phoenix": {
+    "siteId": "qLDA4aLQO0b9NKNHqjc3",
+    "siteName": "Phoenix House",
+    "kioskName": "Energic - Phoenix House",
+    "kioskId": "h8IvMP5CuKc3DDj5OQnL",
+    "appLabel": "Energic Phoenix Kiosk",
+    "defaultHours": 8,
+    "expiryMode": "midnight"
+  },
+  "ashbourne-chantry": {
+    "siteId": "El8pXmUZzAETtCwGRZNt",
+    "siteName": "Chantry House",
+    "kioskName": "Ashbourne Nursery - Chantry House",
+    "kioskId": "lJzx6VWehMov4qdZIj86",
+    "appLabel": "Ashbourne Nursery Kiosk",
+    "defaultHours": 8,
+    "expiryMode": "",
+    "durationOptions": [
+      { "label": "8 Hours", "hours": 8, "description": "Short stay or guest visit" },
+      { "label": "Indefinite", "hours": null, "description": "No expiry — permanent permit" }
+    ]
+  },
+  "zental-chantry": {
+    "siteId": "El8pXmUZzAETtCwGRZNt",
+    "siteName": "Chantry House",
+    "kioskName": "Zental - Chantry House",
+    "kioskId": "7HkIwouIajexwZVNzXYc",
+    "appLabel": "Zental Chantry Kiosk",
+    "defaultHours": 8,
+    "expiryMode": "",
+    "durationOptions": [
+      { "label": "8 Hours", "hours": 8, "description": "Guest or short stay parking" },
+      { "label": "Indefinite", "hours": null, "description": "No expiry permit" }
+    ]
+  },
+  "great-expectations-nursery": {
+    "siteId": "iU3FCvS5zyE1F3qYy473",
+    "siteName": "Great Expectations Nursery",
+    "kioskName": "Great Expectations Nursery",
+    "kioskId": "",
+    "appLabel": "Great Expectations Nursery Kiosk",
+    "defaultHours": 8,
+    "expiryMode": "",
+    "reRegisterCooldownMinutes": 10
+
+  },
+  "stanier-square": {
+    "siteId": "5mY9VkTQRAmhvdawzfDQ",
+    "siteName": "20 Stanier Square",
+    "kioskName": "20 Stanier Square",
+    "kioskId": "",
+    "appLabel": "20 Stanier Square Kiosk",
+    "defaultHours": 0.75,
+    "expiryMode": "",
+    "reRegisterCooldownMinutes": 10
+  },
+  "queensway-187-201": {
+    "siteId": "2pS4HNDrU9p4IR6beVNc",
+    "siteName": "187 - 201 Queensway",
+    "kioskName": "187 - 201 Queensway",
+    "kioskId": "",
+    "appLabel": "187-201 Queensway Kiosk",
+    "defaultHours": 0.5,
+    "expiryMode": "",
+    "reRegisterCooldownMinutes": 10
+  },
+  "queensway-195": {
+    "siteId": "yfXJxzWSXVllV9ZpJOhM",
+    "siteName": "Inspire Estate Agents",
+    "kioskName": "Inspire Estate Agents",
+    "kioskId": "",
+    "appLabel": "195 Queensway Kiosk",
+    "defaultHours": 0.5,
+    "expiryMode": "",
+    "reRegisterCooldownMinutes": 10
+  },
+  "queensway-195-new": {
+    "siteId": "IbIdjgwOVNwBOFxsgFQN",
+    "siteName": "195 Queensway",
+    "kioskName": "195 Queensway",
+    "kioskId": "",
+    "appLabel": "195 Queensway Kiosk",
+    "defaultHours": 3,
+    "expiryMode": "",
+    "reRegisterCooldownMinutes": 10
+  },
+  "high-street-north-16-18": {
+    "siteId": "doQpManF29atu10mkOlU",
+    "siteName": "16-18 High Street North",
+    "kioskName": "16-18 High Street North",
+    "kioskId": "",
+    "appLabel": "16-18 High Street North Kiosk",
+    "defaultHours": 1,
+    "expiryMode": "",
+    "reRegisterCooldownMinutes": 10,
+    "durationOptions": [
+      { "label": "1 hr", "hours": 1, "description": "Short stay" },
+      { "label": "90 min", "hours": 1.5, "description": "Medium stay" },
+      { "label": "2 hrs", "hours": 2, "description": "Extended stay" }
+    ]
+  }
+}

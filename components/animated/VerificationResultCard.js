@@ -1,35 +1,16 @@
 import { Box, Chip, Typography, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
 import Lottie from 'lottie-react';
-import { useEffect, useState } from 'react';
+import successAnimData from '../../public/lottie/success.json';
 
-// Local hook to load Lottie JSON from a path
-function useLottie(path) {
-  const [data, setData] = useState(null);
-  useEffect(() => {
-    let m = true;
-    (async () => {
-      try {
-        if (!path) { setData(null); return; }
-        const res = await fetch(path, { cache: 'force-cache' });
-        if (!res.ok) { setData(null); return; }
-        const json = await res.json();
-        if (m) setData(json);
-      } catch { setData(null); }
-    })();
-    return () => { m = false; };
-  }, [path]);
-  return data;
-}
-
-export default function VerificationResultCard({ status = 'valid', title, subtitle, details }){
+export default function VerificationResultCard({ status = 'valid', title, subtitle, details, compact = false }){
   const colors = {
-    valid: { chip: 'success', bg: 'linear-gradient(135deg, #0b2e13, #052f1b)' },
-    expiring: { chip: 'warning', bg: 'linear-gradient(135deg, #2c250b, #3a2a05)' },
-    invalid: { chip: 'error', bg: 'linear-gradient(135deg, #2a0b0b, #3b0a0a)' },
+    valid: { chip: 'success', bg: (t)=> t.palette.mode === 'dark' ? 'linear-gradient(135deg, #0b2e13, #052f1b)' : 'linear-gradient(135deg, #e8f5e9, #c8e6c9)' },
+    expiring: { chip: 'warning', bg: (t)=> t.palette.mode === 'dark' ? 'linear-gradient(135deg, #2c250b, #3a2a05)' : 'linear-gradient(135deg, #fff8e1, #ffecb3)' },
+    invalid: { chip: 'error', bg: (t)=> t.palette.mode === 'dark' ? 'linear-gradient(135deg, #2a0b0b, #3b0a0a)' : 'linear-gradient(135deg, #ffebee, #ffcdd2)' },
   };
   const v = colors[status] || colors.valid;
-  const successAnim = useLottie(status === 'valid' ? '/lottie/success.json' : '/lottie/Success.json');
+  const visibleDetailEntries = details ? Object.entries(details).filter(([, value]) => Boolean(value)) : [];
 
   return (
     <Paper component={motion.div}
@@ -37,22 +18,26 @@ export default function VerificationResultCard({ status = 'valid', title, subtit
       animate={{ rotateY: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 180, damping: 16 }}
       elevation={12}
-      sx={{ p: 2, borderRadius: 3, background: v.bg, color: '#fff', width: '100%', maxWidth: 560, position: 'relative', overflow: 'hidden' }}
+      sx={{ p: { xs: 1, sm: 1.75, md: 2.5 }, borderRadius: 2, background: (t)=> (typeof v.bg === 'function' ? v.bg(t) : v.bg), color: (t)=> t.palette.mode === 'dark' ? '#fff' : t.palette.text.primary, width: '100%', maxWidth: { xs: '100%', sm: 460, md: 520 } }}
     >
-      {status === 'valid' && successAnim && (
-        <Box sx={{ position: 'absolute', top: -50, right: -50, width: 240, height: 240, opacity: 0.15, pointerEvents: 'none' }}>
-          <Lottie animationData={successAnim} loop={false} />
+      {status === 'valid' && !compact && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: { xs: 0.25, sm: 0.5 } }}>
+          <Lottie animationData={successAnimData} loop={false} style={{ width: 72, height: 72, maxWidth: '100%' }} />
         </Box>
       )}
       <Box sx={{ position: 'relative' }}>
-        <Box sx={{ display:'flex', alignItems:'center', justifyContent:'space-between', mb: 1 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>{title}</Typography>
-          <Chip color={v.chip} label={status.toUpperCase()} size="small" />
+        <Box sx={{ display:'flex', alignItems:{ xs: 'flex-start', sm: 'center' }, justifyContent:'space-between', mb: 0.75, gap: 1, flexWrap: 'wrap' }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, fontSize: { xs: '0.82rem', sm: '1rem', md: '1.15rem' }, lineHeight: 1.2, pr: 0.5 }}>{title}</Typography>
+          <Chip color={v.chip} label={status.toUpperCase()} size="small" sx={{ height: { xs: 22, sm: 24 } }} />
         </Box>
-        {subtitle && <Typography variant="body2" sx={{ opacity: 0.9, mb: 1 }}>{subtitle}</Typography>}
-        {details && (
-          <Box sx={{ bgcolor: 'rgba(0,0,0,0.25)', p: 1.5, borderRadius: 2, fontFamily: 'monospace' }}>
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{JSON.stringify(details, null, 2)}</pre>
+        {subtitle && <Typography variant="body2" sx={{ opacity: 0.9, mb: 0.5, fontSize: { xs: '0.68rem', sm: '0.82rem', md: '0.9rem' }, lineHeight: 1.3 }}>{subtitle}</Typography>}
+        {visibleDetailEntries.length > 0 && (
+          <Box sx={{ bgcolor: (t)=> t.palette.mode === 'dark' ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.06)', p: { xs: 0.5, sm: 0.875 }, borderRadius: 1.5 }}>
+            {visibleDetailEntries.map(([k, v]) => (
+              <Typography key={k} variant="caption" component="p" sx={{ fontSize: { xs: '0.68rem', sm: '0.78rem' }, lineHeight: 1.4, textTransform: 'capitalize' }}>
+                <b>{k}:</b> {String(v)}
+              </Typography>
+            ))}
           </Box>
         )}
       </Box>

@@ -54,15 +54,17 @@ export default function SplashScreen({ onDone, autoHideMs = 2200 }){
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: reduceMotion ? 0 : 0.6 }}
-      sx={{ position:'fixed', inset:0, zIndex:(t)=>t.zIndex.modal+10, display:'grid', placeItems:'center',
-        background:(t)=>`radial-gradient(1200px 700px at 50% -10%, ${t.palette.background.default} 0%, #0a0f1c 45%, #050914 100%)`,
-        color:(t)=>t.palette.primary.contrastText }}
+      sx={{ position:'fixed', inset:0, zIndex:(t)=>t.zIndex.modal+10, display:'flex', alignItems:'center', justifyContent:'center', overflowY:'auto',
+        background:(t)=> t.palette.mode === 'dark'
+          ? `radial-gradient(1200px 700px at 50% -10%, ${t.palette.background.default} 0%, #0a0f1c 45%, #050914 100%)`
+          : `radial-gradient(1200px 700px at 50% -10%, ${t.palette.background.default} 0%, #d6e8ff 45%, #cce0ff 100%)`,
+        color:(t)=> t.palette.mode === 'dark' ? t.palette.primary.contrastText : t.palette.text.primary }}
       role="dialog" aria-modal="true" aria-label="Loading"
     >
-      <Box sx={{ textAlign:'center', position:'relative' }}>
+      <Box sx={{ textAlign:'center', position:'relative', px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 }, width: '100%', maxWidth: 480, mx: 'auto' }}>
         {/* Centered brand watermark using the primary logo */}
-        <BrandWatermark center maxSize={280} opacity={0.25} paths={["/img/logo.png","/img/logo.svg","/img/logo.jpg","/icons/icon-512.png","/icons/icon-192.png","/reference.png"]} />
-        <Box sx={{ width: 220, height: 220, mx:'auto', mb: 2, position:'relative' }}>
+        <BrandWatermark center maxSize={200} opacity={0.2} paths={["/img/logo.png","/img/logo.svg","/img/logo.jpg","/icons/icon-512.png","/icons/icon-192.png","/reference.png"]} />
+        <Box sx={{ width: { xs: 100, sm: 150, md: 220 }, height: { xs: 100, sm: 150, md: 220 }, mx:'auto', mb: { xs: 0.75, sm: 1.5 }, position:'relative' }}>
           {anim ? (
             <Lottie autoplay={!reduceMotion} loop={!reduceMotion} animationData={anim} style={{ width:'100%', height:'100%' }} />
           ) : (
@@ -74,16 +76,16 @@ export default function SplashScreen({ onDone, autoHideMs = 2200 }){
           )}
           {/* Always show the brand logo in the center of the loader */}
           <Box sx={{ position:'absolute', inset:0, display:'grid', placeItems:'center' }}>
-            <Box sx={{ width: 96, height: 96, borderRadius: '20%', bgcolor:'transparent',
+            <Box sx={{ width: { xs: 36, sm: 52, md: 76 }, height: { xs: 36, sm: 52, md: 76 }, borderRadius: '20%', bgcolor:'transparent',
               backgroundImage: 'url(/img/logo.png)', backgroundRepeat:'no-repeat', backgroundPosition:'center', backgroundSize:'contain',
               filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.25))'
             }}/>
           </Box>
-          <Box sx={{ position:'absolute', inset:-12, filter:'blur(24px)', opacity:0.4, borderRadius:'50%', background:(t)=>t.palette.primary.main }} />
+          <Box sx={{ position:'absolute', inset:-8, filter:'blur(18px)', opacity:0.35, borderRadius:'50%', background:(t)=>t.palette.primary.main }} />
         </Box>
-        <Typography variant="h4" sx={{ fontWeight:800, letterSpacing:1.5, mb: 0.5 }}>e‑Permit</Typography>
-        <Typography variant="subtitle1" sx={{ opacity:0.8, mb: 3 }}>Fast • Modern • Kiosk‑ready</Typography>
-        <Button onClick={()=>setShow(false)} variant="contained">Skip</Button>
+        <Typography variant="h4" sx={{ fontWeight:800, letterSpacing:1.5, mb: 0.25, fontSize: { xs: '1rem', sm: '1.4rem', md: '2rem' } }}>e‑Permit</Typography>
+        <Typography variant="subtitle1" sx={{ opacity:0.8, mb: { xs: 1, sm: 2 }, fontSize: { xs: '0.72rem', sm: '0.88rem', md: '1rem' } }}>Fast • Modern • Kiosk‑ready</Typography>
+        <Button onClick={()=>setShow(false)} variant="contained" size="small" sx={{ fontSize: { xs: '0.78rem', sm: '0.9rem' } }}>Skip</Button>
       </Box>
     </Box>
   );
