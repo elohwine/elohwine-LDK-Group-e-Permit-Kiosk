@@ -30,23 +30,6 @@ const VehicleCheckCard = dynamic(() => import("./VehicleCheckCard"), { ssr: fals
 const AUTO_RESET_MS = 30000;
 const APPLY_DEDUPE_WINDOW_MS = 10 * 60 * 1000;
 
-function formatUkDateTime(value) {
-  if (!value) return "";
-  try {
-    return new Date(value).toLocaleString("en-GB", {
-      timeZone: "Europe/London",
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
-  } catch {
-    return String(value);
-  }
-}
-
 export default function VrmLookupFlow() {
   const [step, setStep] = useState("idle");
   const [vrm, setVrm] = useState("");
@@ -123,8 +106,9 @@ export default function VrmLookupFlow() {
     try {
       const { permits, online, apiError } = await getPermitsByVRM(trimmed);
       const sitePermits = (permits || []).filter((p) => p.siteId === settings.siteId);
-      const cooldownMinutes = Number(siteRules?.reRegisterCooldownMinutes ?? settings.reRegisterCooldownMinutes ?? 0) || 0;
-      // Find an active (not expired) permit on this site
+      // Find an active (not expired) permit on this site. A 24-hour permit used to
+      // stay blocked until its end plus a cooldown, so visitors still saw
+      // "re-registration is not permitted" the next day. Registration now continues.
       const now = Date.now();
       const active = sitePermits.find(
         (p) =>
@@ -132,27 +116,7 @@ export default function VrmLookupFlow() {
           // null/missing end = permanent permit (never expires)
           (p.end === null || p.end === undefined || p.end === '' || new Date(p.end).getTime() > now)
       );
-      const latestEnded = sitePermits
-        .filter((p) => p.end && !Number.isNaN(new Date(p.end).getTime()))
-        .sort((a, b) => new Date(b.end).getTime() - new Date(a.end).getTime())[0] || null;
-      const reRegisterBlockedUntil = latestEnded && cooldownMinutes > 0
-        ? new Date(new Date(latestEnded.end).getTime() + cooldownMinutes * 60 * 1000)
-        : null;
-      const isReRegisterBlocked = !!reRegisterBlockedUntil && now < reRegisterBlockedUntil.getTime();
-      // Block re-registration if within the cooldown window.
-      // This covers both: (a) permit still active, and (b) recently expired within cooldown.
-      // latestEnded picks up active permits too (end in future), so isReRegisterBlocked
-      // fires correctly regardless of whether the permit has expired yet.
-      if (isReRegisterBlocked) {
-        const blockedMsg = active
-          ? `This vehicle already has an active permit. Re-registration is not permitted until ${formatUkDateTime(reRegisterBlockedUntil)}.`
-          : `This VRM cannot be re-registered until ${formatUkDateTime(reRegisterBlockedUntil)}.`;
-        setErrorMsg(blockedMsg);
-        setStep("error");
-        return;
-      }
-      // No cooldown site — if active permit found, store it so doIssue can extend
-      // it silently instead of creating a duplicate.
+      // An existing permit is renewed from now instead of creating a duplicate.
       if (active) setFoundPermit(active);
       await doCarCheck(trimmed);
     } catch (err) {
