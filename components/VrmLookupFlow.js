@@ -28,7 +28,24 @@ const VehicleCheckCard = dynamic(() => import("./VehicleCheckCard"), { ssr: fals
 */
 
 const AUTO_RESET_MS = 30000;
-const APPLY_DEDUPE_WINDOW_MS = 10 * 60 * 1000;
+
+function formatUkTime(value) {
+  try {
+    return new Date(value).toLocaleTimeString("en-GB", {
+      timeZone: "Europe/London",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  } catch {
+    return "";
+  }
+}
+
+function toCooldownMinutes(value) {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
 
 export default function VrmLookupFlow() {
   const [step, setStep] = useState("idle");
@@ -44,8 +61,19 @@ export default function VrmLookupFlow() {
   const [result, setResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [initError, setInitError] = useState("");
+  // Dashboard kiosk setting, delivered on each heartbeat. Overrides the baked-in value.
+  const [dashboardCooldown, setDashboardCooldown] = useState(null);
   const resetTimer = useRef(null);
   const vrmInputRef = useRef(null);
+
+  useEffect(() => {
+    function onHeartbeat(e) {
+      const value = e?.detail?.kiosk?.reRegisterCooldownMinutes;
+      if (value !== undefined && value !== null) setDashboardCooldown(toCooldownMinutes(value));
+    }
+    window.addEventListener("kiosk:heartbeat_ok", onHeartbeat);
+    return () => window.removeEventListener("kiosk:heartbeat_ok", onHeartbeat);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -106,10 +134,24 @@ export default function VrmLookupFlow() {
     try {
       const { permits, online, apiError } = await getPermitsByVRM(trimmed);
       const sitePermits = (permits || []).filter((p) => p.siteId === settings.siteId);
-      // Find an active (not expired) permit on this site. A 24-hour permit used to
-      // stay blocked until its end plus a cooldown, so visitors still saw
-      // "re-registration is not permitted" the next day. Registration now continues.
       const now = Date.now();
+      // The cooldown counts from the last registration, never from the permit end,
+      // so a 24-hour permit can be renewed straight away once the cooldown passes.
+      // The live site still reports 0 to neutralise older installed builds, so
+      // that value is not used here.
+      const cooldownMinutes = dashboardCooldown ?? toCooldownMinutes(settings.reRegisterCooldownMinutes);
+      if (cooldownMinutes > 0) {
+        const lastRegisteredMs = sitePermits
+          .map((p) => new Date(p.start || p.createdAt || p.queuedAt || 0).getTime())
+          .filter((ms) => Number.isFinite(ms) && ms > 0 && ms <= now)
+          .sort((a, b) => b - a)[0];
+        const retryAtMs = lastRegisteredMs ? lastRegisteredMs + cooldownMinutes * 60 * 1000 : 0;
+        if (retryAtMs > now) {
+          setErrorMsg(`This vehicle was registered at ${formatUkTime(lastRegisteredMs)}. You can register it again from ${formatUkTime(retryAtMs)}.`);
+          setStep("error");
+          return;
+        }
+      }
       const active = sitePermits.find(
         (p) =>
           p.status !== 'expired' && p.status !== 'cancelled' &&
@@ -215,10 +257,6 @@ export default function VrmLookupFlow() {
     setStep("issuing");
     try {
       if (foundPermit) {
-        const startMs = new Date(foundPermit.start || foundPermit.createdAt || foundPermit.queuedAt || 0).getTime();
-        if (Number.isFinite(startMs) && (Date.now() - startMs) < APPLY_DEDUPE_WINDOW_MS) {
-          throw new Error(`Another session is already in progress (session ${foundPermit.id}). Please wait 10 minutes before applying again.`);
-        }
         // Active permit found — extend it silently; no duplicate created
         const h = durationChoice.hours;
         const isIndefinite = h === null;
