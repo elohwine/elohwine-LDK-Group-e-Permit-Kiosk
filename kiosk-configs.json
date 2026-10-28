@@ -263,5 +263,45 @@
         "description": "Standard parking duration"
       }
     ]
+  },
+  "stephenson-house": {
+    "siteId": "TZqwJgVVeyzHOeA4KPaQ",
+    "siteName": "Stephenson House",
+    "kioskName": "Stephenson House",
+    "kioskId": "",
+    "appLabel": "Stephenson House Kiosk",
+    "defaultHours": 24,
+    "expiryMode": "",
+    "reRegisterCooldownMinutes": 10,
+    "durationOptions": [
+      {
+        "code": "hours-24",
+        "hours": 24,
+        "permitType": "temporary",
+        "expiryMode": "",
+        "description": "Standard parking duration",
+        "label": "24 Hours"
+      }
+    ]
+  },
+  "stephenson-house-mid": {
+    "siteId": "kAf7ZJcdVvwmmBU8fKin",
+    "siteName": "Stephenson House - MID",
+    "kioskName": "Stephenson House - MID",
+    "kioskId": "",
+    "appLabel": "Stephenson House - MID Kiosk",
+    "defaultHours": 8,
+    "expiryMode": "",
+    "reRegisterCooldownMinutes": 10,
+    "durationOptions": [
+      {
+        "code": "hours-8",
+        "hours": 8,
+        "permitType": "temporary",
+        "expiryMode": "",
+        "description": "Standard parking duration",
+        "label": "8 Hours"
+      }
+    ]
   }
 }

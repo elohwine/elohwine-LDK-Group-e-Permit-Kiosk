@@ -4,6 +4,11 @@ import CloseIcon from '@mui/icons-material/Close';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import { getSettings } from '../lib/permits';
+import buildConfig from '../kiosk.config.json';
+
+// Fallback identity comes from the per-site build config, never a hardcoded site.
+const FALLBACK_SITE_NAME = buildConfig?.siteName || buildConfig?.kioskName || 'LDK ePermit';
+const FALLBACK_KIOSK_NAME = buildConfig?.kioskName || buildConfig?.siteName || 'LDK ePermit';
 
 const QR_REFRESH_SECONDS = 60;
 
@@ -20,7 +25,7 @@ export default function QrLandingPage() {
         const s = await getSettings();
         if (active) setSettings(s);
       } catch {
-        if (active) setSettings({ siteName: 'PureGym Stafford', kioskName: 'PureGym Stafford' });
+        if (active) setSettings({ siteName: FALLBACK_SITE_NAME, kioskName: FALLBACK_KIOSK_NAME });
       }
     })();
     return () => { active = false; };
@@ -45,8 +50,8 @@ export default function QrLandingPage() {
     return () => document.removeEventListener('fullscreenchange', sync);
   }, []);
 
-  const siteName = settings?.siteName || settings?.siteDisplayName || 'PureGym Stafford';
-  const kioskName = settings?.kioskName || settings?.siteName || 'PureGym Stafford';
+  const siteName = settings?.siteName || settings?.siteDisplayName || FALLBACK_SITE_NAME;
+  const kioskName = settings?.kioskName || settings?.siteName || FALLBACK_KIOSK_NAME;
   const qrRefreshSeconds = useMemo(() => {
     const raw = Number(settings?.qrRefreshSeconds);
     if (Number.isFinite(raw) && raw >= 10 && raw <= 300) {
