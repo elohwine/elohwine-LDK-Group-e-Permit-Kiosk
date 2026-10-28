@@ -16,6 +16,26 @@ function setNativeValue(element, value) {
   }
 }
 
+const TEXT_INPUT_TYPES = new Set(['', 'text', 'search', 'email', 'tel', 'url', 'number', 'password']);
+
+// Only real, editable, visible text fields may summon the on-screen keyboard.
+export function isTypableElement(el) {
+  if (!el || el.disabled || el.readOnly) return false;
+  if (el.dataset?.kioskKbd === 'off') return false;
+  if (el.getAttribute?.('aria-hidden') === 'true') return false;
+  if (el.classList?.contains('MuiSelect-nativeInput')) return false;
+  const tag = el.tagName;
+  if (tag === 'TEXTAREA') return true;
+  if (tag === 'INPUT') return TEXT_INPUT_TYPES.has((el.getAttribute('type') || '').toLowerCase());
+  return !!el.isContentEditable;
+}
+
+function isVisible(el) {
+  if (!el?.isConnected) return false;
+  const rect = el.getBoundingClientRect();
+  return rect.width > 0 && rect.height > 0;
+}
+
 export default function KioskKeyboardProvider({ children }) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -46,10 +66,8 @@ export default function KioskKeyboardProvider({ children }) {
   useEffect(() => {
     const onFocusIn = (ev) => {
       const el = ev.target;
-      if (!el) return;
-      if (el.dataset?.kioskKbd === 'off') return;
+      if (!isTypableElement(el)) return;
       const tag = el.tagName;
-      if (tag !== 'INPUT' && tag !== 'TEXTAREA' && !el.isContentEditable) return;
       const inputType = (el.type || '').toLowerCase();
       const im = (el.inputMode || '').toLowerCase();
       const numeric = inputType === 'number' || im === 'numeric' || im === 'decimal';
@@ -67,10 +85,8 @@ export default function KioskKeyboardProvider({ children }) {
     const onFocusOut = (ev) => {
       setTimeout(() => {
         const active = document.activeElement;
-        if (!active) { targetRef.current = null; setHasTarget(false); setArrowY(null); return; }
-        if (active.closest?.('[data-keyboard-element]')) return;
-        const tag = active.tagName;
-        if (tag === 'INPUT' || tag === 'TEXTAREA' || active.isContentEditable) return;
+        if (active && active.closest?.('[data-keyboard-element]') && isVisible(targetRef.current)) return;
+        if (active && isTypableElement(active)) return;
         // Restore original inputMode when leaving the field
         if (targetRef.current && targetRef.current._origInputMode !== undefined) {
           targetRef.current.inputMode = targetRef.current._origInputMode;
@@ -83,6 +99,8 @@ export default function KioskKeyboardProvider({ children }) {
 
     document.addEventListener('focusin', onFocusIn);
     document.addEventListener('focusout', onFocusOut);
+    // Children (e.g. autoFocus VRM field) may have focused before this listener existed
+    if (isTypableElement(document.activeElement)) onFocusIn({ target: document.activeElement });
     return () => {
       document.removeEventListener('focusin', onFocusIn);
       document.removeEventListener('focusout', onFocusOut);
@@ -102,29 +120,37 @@ export default function KioskKeyboardProvider({ children }) {
     }
   }, []);
 
-  // Auto-focus first visible input whenever no field is active
+  // Auto-focus first visible text field whenever no field is active
   useEffect(() => {
     if (hasTarget) return;
     const timer = setTimeout(() => {
-      const active = document.activeElement;
-      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
-      const inputs = Array.from(document.querySelectorAll(
-        'input:not([disabled]):not([type="hidden"]):not([data-kiosk-kbd="off"]), textarea:not([disabled])'
-      )).filter(el => {
-        const rect = el.getBoundingClientRect();
-        return rect.width > 0 && rect.height > 0;
-      });
+      if (isTypableElement(document.activeElement)) {
+        document.activeElement.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+        return;
+      }
+      const inputs = Array.from(document.querySelectorAll('input, textarea, [contenteditable="true"]'))
+        .filter((el) => isTypableElement(el) && isVisible(el));
       if (inputs[0]) inputs[0].focus();
     }, 300);
     return () => clearTimeout(timer);
   }, [hasTarget]);
 
+  // Hide the keyboard if its field leaves the screen (e.g. step change while a key button holds focus)
+  useEffect(() => {
+    if (!hasTarget) return;
+    const timer = setInterval(() => {
+      if (isVisible(targetRef.current)) return;
+      targetRef.current = null;
+      setHasTarget(false);
+    }, 250);
+    return () => clearInterval(timer);
+  }, [hasTarget]);
+
   // "Next" advances to the next input instead of closing keyboard
   const handleNext = useCallback(() => {
     const el = targetRef.current;
-    const inputs = Array.from(document.querySelectorAll(
-      'input:not([disabled]):not([type="hidden"]):not([data-kiosk-kbd="off"]), textarea:not([disabled])'
-    ));
+    const inputs = Array.from(document.querySelectorAll('input, textarea, [contenteditable="true"]'))
+      .filter((node) => isTypableElement(node) && isVisible(node));
     const idx = inputs.indexOf(el);
     const next = inputs[idx + 1];
     if (next) {
@@ -162,7 +188,8 @@ export default function KioskKeyboardProvider({ children }) {
         {children}
       </Box>
 
-      {/* Keyboard panel — flat, full-width, fills all remaining height */}
+      {/* Keyboard panel — only shown while a text field is being edited */}
+      {hasTarget && (
       <Box
         data-keyboard-element="true"
         ref={panelRef}
@@ -239,7 +266,8 @@ export default function KioskKeyboardProvider({ children }) {
           onEnter={handleEnter}
         />
         </Box>{/* end inner clip */}
-      </Box>{/* end panel */}
+      </Box>
+      )}{/* end panel */}
     </Box>
   );
 }

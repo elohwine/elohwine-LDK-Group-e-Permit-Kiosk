@@ -9,6 +9,7 @@ import {
   getSettings, getPermitsByVRM, issuePermit, lookupCarCheck, extendPermit,
   getSiteRules, triggerSquarePayment
 } from "../lib/permits";
+import { durationChoice as configuredDurationChoice, markDurationMenuLoaded } from "../lib/kioskDurations.mjs";
 const FeedbackDialog = dynamic(() => import("./animated/FeedbackDialog"), { ssr: false });
 const VerificationResultCard = dynamic(() => import("./animated/VerificationResultCard"), { ssr: false });
 const VehicleCheckCard = dynamic(() => import("./VehicleCheckCard"), { ssr: false });
@@ -61,33 +62,77 @@ export default function VrmLookupFlow() {
   const [result, setResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [initError, setInitError] = useState("");
+  const [durationError, setDurationError] = useState("");
   // Dashboard kiosk setting, delivered on each heartbeat. Overrides the baked-in value.
   const [dashboardCooldown, setDashboardCooldown] = useState(null);
   const resetTimer = useRef(null);
   const vrmInputRef = useRef(null);
+  const stepRef = useRef(step);
+  stepRef.current = step;
 
   useEffect(() => {
     function onHeartbeat(e) {
       const value = e?.detail?.kiosk?.reRegisterCooldownMinutes;
       if (value !== undefined && value !== null) setDashboardCooldown(toCooldownMinutes(value));
+      if (["idle", "vehicle-confirm", "duration-select"].includes(stepRef.current)) {
+        getSettings().then((next) => {
+          if (!["idle", "vehicle-confirm", "duration-select"].includes(stepRef.current)) return;
+          setSettings(next);
+          setHours(next.defaultHours == null ? "" : String(next.defaultHours));
+          setSelectedDurationChoice(null);
+          setIndefinitePermit(false);
+          setDurationError(next.durationConfigError || "");
+        }).catch((error) => {
+          console.error("Could not refresh kiosk durations:", error);
+          setDurationError("Could not refresh parking duration settings.");
+        });
+      }
     }
+    const onConfigError = (event) => setDurationError(event.detail?.message || "Could not apply kiosk duration settings.");
     window.addEventListener("kiosk:heartbeat_ok", onHeartbeat);
-    return () => window.removeEventListener("kiosk:heartbeat_ok", onHeartbeat);
+    window.addEventListener("kiosk:reload_config", onHeartbeat);
+    window.addEventListener("kiosk:duration_config_error", onConfigError);
+    return () => {
+      window.removeEventListener("kiosk:heartbeat_ok", onHeartbeat);
+      window.removeEventListener("kiosk:reload_config", onHeartbeat);
+      window.removeEventListener("kiosk:duration_config_error", onConfigError);
+    };
   }, []);
+
+  useEffect(() => {
+    if (!["idle", "vehicle-confirm", "duration-select"].includes(step)) return;
+    try {
+      markDurationMenuLoaded(settings, localStorage);
+    } catch (error) {
+      console.error("Could not confirm duration menu refresh:", error);
+      setDurationError("Could not confirm parking menu configuration.");
+    }
+  }, [settings, step]);
+
+  useEffect(() => {
+    if (!["idle", "vehicle-confirm", "duration-select"].includes(step)) return;
+    let active = true;
+    getSettings().then((next) => {
+      if (!active) return;
+      setSettings(next);
+      setHours(next.defaultHours == null ? "" : String(next.defaultHours));
+      setDurationError(next.durationConfigError || "");
+    }).catch((error) => {
+      console.error("Could not load kiosk durations:", error);
+      setDurationError("Could not load parking duration settings.");
+    });
+    return () => { active = false; };
+  }, [step]);
 
   useEffect(() => {
     (async () => {
       try {
         const s = await getSettings();
-        setSettings(s);
         try {
           const rules = await getSiteRules(s.siteId);
           setSiteRules(rules);
-          if (rules?.defaultHours) setHours(String(rules.defaultHours));
-          else if (s.defaultHours) setHours(String(s.defaultHours));
         } catch (err) {
           // Site rules failed but settings loaded — use defaults, show warning
-          if (s.defaultHours) setHours(String(s.defaultHours));
           setInitError("Could not load site rules — using defaults. The server may be starting up.");
         }
       } catch (err) {
@@ -114,7 +159,7 @@ export default function VrmLookupFlow() {
     setStep("idle");
     setVrm("");
     setEmail("");
-    setHours(String(siteRules?.defaultHours ?? settings.defaultHours ?? 2));
+    setHours(String(settings.defaultHours ?? siteRules?.defaultHours ?? 2));
     setIndefinitePermit(false);
     setSelectedDurationChoice(null);
     setFoundPermit(null);
@@ -183,13 +228,15 @@ export default function VrmLookupFlow() {
   }
 
   const isPaid = siteRules?.parkingType === "paid" && siteRules?.hourlyRate > 0;
-  const parsedHours = indefinitePermit ? null : (parseFloat(hours) || siteRules?.defaultHours || settings.defaultHours || 2);
-  const totalCost = isPaid ? (parsedHours * (siteRules?.hourlyRate ?? 0)).toFixed(2) : "0.00";
+  const parsedHours = indefinitePermit ? null : (parseFloat(hours) || settings.defaultHours || siteRules?.defaultHours || 2);
+  const totalCost = isPaid ? (resolveDurationChoice().hours * (siteRules?.hourlyRate ?? 0)).toFixed(2) : "0.00";
   const currency = siteRules?.currency || "GBP";
   const currencySymbol = currency === "GBP" ? "£" : currency === "USD" ? "$" : currency === "EUR" ? "€" : currency;
 
   function resolveDurationChoice(choice = selectedDurationChoice) {
     if (choice) return choice;
+    if (settings.durationOptions?.length === 1) return configuredDurationChoice(settings.durationOptions[0]);
+    if (settings.expiryMode === "midnight") return configuredDurationChoice({ expiryMode: "midnight" });
     return {
       hours: parsedHours,
       indefinite: indefinitePermit,
@@ -198,18 +245,14 @@ export default function VrmLookupFlow() {
   }
 
   async function handleDurationSelect(option, vehicleDetails = vehicleData) {
-    const durationChoice = {
-      hours: option.hours,
-      indefinite: option.hours === null,
-      label: option.hours === null ? "Indefinite (no expiry)" : `${option.hours} hour${option.hours !== 1 ? "s" : ""}`,
-    };
+    const durationChoice = configuredDurationChoice(option);
 
-    if (option.hours === null) {
+    if (durationChoice.indefinite) {
       setIndefinitePermit(true);
       setHours("");
     } else {
       setIndefinitePermit(false);
-      setHours(String(option.hours));
+      setHours(String(durationChoice.hours));
     }
     setSelectedDurationChoice(durationChoice);
 
@@ -224,6 +267,10 @@ export default function VrmLookupFlow() {
   async function continueAfterCarCheck(vehicleDetails) {
     if (settings.durationOptions?.length > 1) {
       setStep("duration-select");
+      return;
+    }
+    if (settings.durationOptions?.length === 1) {
+      await handleDurationSelect(settings.durationOptions[0], vehicleDetails);
       return;
     }
 
@@ -433,9 +480,9 @@ export default function VrmLookupFlow() {
         <Divider sx={{ mb: { xs: 0.75, sm: 1 }, opacity: 0.12 }} />
 
         {/* ─── Init error banner ─── */}
-        <Collapse in={!!initError}>
+        <Collapse in={!!(durationError || initError)}>
           <Alert severity="warning" sx={{ mb: 1, py: 0.25, '& .MuiAlert-message': { fontSize: '0.78rem' } }}>
-            {initError}
+            {durationError || initError}
           </Alert>
         </Collapse>
 
@@ -483,7 +530,7 @@ export default function VrmLookupFlow() {
             <Box sx={{ display: "flex", gap: 1.25, flexDirection: { xs: "column", sm: "row" } }}>
               {(settings.durationOptions || []).map((opt) => (
                 <Card
-                  key={opt.label}
+                  key={opt.code || opt.label}
                   elevation={3}
                   sx={{
                     flex: 1,

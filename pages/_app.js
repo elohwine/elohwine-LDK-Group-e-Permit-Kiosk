@@ -4,11 +4,13 @@ import Head from 'next/head'
 import { useTheme } from '@mui/material/styles'
 import theme, { ColorModeProvider, useColorMode } from '../lib/theme'
 import Brightness6Icon from '@mui/icons-material/Brightness6'
+import QrCodeIcon from '@mui/icons-material/QrCode'
 import BrandWatermark from '../components/BrandWatermark'
 import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { initPWAClient } from '../lib/pwa'
-import { startOfflineSync, sendHeartbeat } from '../lib/permits'
+import { startOfflineSync } from '../lib/permits'
 import { startAutoUpdater } from '../lib/updater'
 
 const KioskKeyboardProvider = dynamic(() => import('../components/KioskKeyboardProvider'), { ssr: false });
@@ -24,7 +26,32 @@ function ModeToggle() {
   );
 }
 
+function QrShortcutButton() {
+  const router = useRouter();
+  return (
+    <Tooltip title="Open QR landing page">
+      <IconButton
+        color="inherit"
+        onClick={() => router.push('/qr')}
+        sx={{
+          position: 'fixed',
+          right: { xs: 8, sm: 12, md: 16 },
+          top: { xs: 8, sm: 12, md: 16 },
+          zIndex: (t) => t.zIndex.tooltip + 1,
+          bgcolor: 'transparent',
+          '&:hover': { bgcolor: 'action.hover' },
+        }}
+        aria-label="open qr landing page"
+      >
+        <QrCodeIcon sx={{ fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' } }} />
+      </IconButton>
+    </Tooltip>
+  );
+}
+
 function MyApp({ Component, pageProps }) {
+  const router = useRouter();
+  const isQrRoute = router.pathname === '/qr';
   const [remoteMsg, setRemoteMsg] = useState(null);        // { text, duration }
   const [maintenance, setMaintenance] = useState(null);    // null | string reason
   const [commandProcessing, setCommandProcessing] = useState(null); // { active, type, stage, message, progress, commandId }
@@ -79,12 +106,9 @@ function MyApp({ Component, pageProps }) {
       }
       setTimeout(() => setCommandProcessing(null), 2500);
     };
-    // reload_config / set_config / set_duration — pull fresh config from server immediately
-    const onReloadConfig = () => { sendHeartbeat().catch(() => {}); };
     window.addEventListener('kiosk:display_message',  onMsg);
     window.addEventListener('kiosk:set_maintenance',  onMaintOn);
     window.addEventListener('kiosk:clear_maintenance', onMaintOff);
-    window.addEventListener('kiosk:reload_config', onReloadConfig);
     window.addEventListener('kiosk:command_processing', onCommandProcessing);
 
     return () => {
@@ -93,7 +117,6 @@ function MyApp({ Component, pageProps }) {
       window.removeEventListener('kiosk:display_message',  onMsg);
       window.removeEventListener('kiosk:set_maintenance',  onMaintOn);
       window.removeEventListener('kiosk:clear_maintenance', onMaintOff);
-      window.removeEventListener('kiosk:reload_config', onReloadConfig);
       window.removeEventListener('kiosk:command_processing', onCommandProcessing);
     };
   }, []);
@@ -179,25 +202,30 @@ function MyApp({ Component, pageProps }) {
           </Box>
         </Box>
       )}
-      <KioskKeyboardProvider>
-        <Box
-          sx={(t)=>({
-            height: '100%',
-            position: 'relative',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            pt: 'calc(env(safe-area-inset-top, 0px) + 4px)',
-            pb: 'calc(env(safe-area-inset-bottom, 0px) + 4px)',
-            pl: 'calc(env(safe-area-inset-left, 0px) + 4px)',
-            pr: 'calc(env(safe-area-inset-right, 0px) + 4px)'
-          })}
-        >
-          <BrandWatermark opacity={0.15} maxSize={300} />
-          <Component {...pageProps} />
-        </Box>
-      </KioskKeyboardProvider>
-      <ModeToggle />
+      {isQrRoute ? (
+        <Component {...pageProps} />
+      ) : (
+        <KioskKeyboardProvider>
+          <Box
+            sx={(t)=>({
+              height: '100%',
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              pt: 'calc(env(safe-area-inset-top, 0px) + 4px)',
+              pb: 'calc(env(safe-area-inset-bottom, 0px) + 4px)',
+              pl: 'calc(env(safe-area-inset-left, 0px) + 4px)',
+              pr: 'calc(env(safe-area-inset-right, 0px) + 4px)'
+            })}
+          >
+            <BrandWatermark opacity={0.15} maxSize={300} />
+            <Component {...pageProps} />
+          </Box>
+        </KioskKeyboardProvider>
+      )}
+      {!isQrRoute ? <QrShortcutButton /> : null}
+      {!isQrRoute ? <ModeToggle /> : null}
     </ColorModeProvider>
   )
 }

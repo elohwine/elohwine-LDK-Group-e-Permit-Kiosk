@@ -35,8 +35,16 @@
     "defaultHours": 8,
     "expiryMode": "",
     "durationOptions": [
-      { "label": "8 Hours", "hours": 8, "description": "Short stay or guest visit" },
-      { "label": "Indefinite", "hours": null, "description": "No expiry — permanent permit" }
+      {
+        "label": "8 Hours",
+        "hours": 8,
+        "description": "Short stay or guest visit"
+      },
+      {
+        "label": "Indefinite",
+        "hours": null,
+        "description": "No expiry — permanent permit"
+      }
     ]
   },
   "zental-chantry": {
@@ -48,8 +56,16 @@
     "defaultHours": 8,
     "expiryMode": "",
     "durationOptions": [
-      { "label": "8 Hours", "hours": 8, "description": "Guest or short stay parking" },
-      { "label": "Indefinite", "hours": null, "description": "No expiry permit" }
+      {
+        "label": "8 Hours",
+        "hours": 8,
+        "description": "Guest or short stay parking"
+      },
+      {
+        "label": "Indefinite",
+        "hours": null,
+        "description": "No expiry permit"
+      }
     ]
   },
   "great-expectations-nursery": {
@@ -60,8 +76,32 @@
     "appLabel": "Great Expectations Nursery Kiosk",
     "defaultHours": 8,
     "expiryMode": "",
-    "reRegisterCooldownMinutes": 10
-
+    "reRegisterCooldownMinutes": 10,
+    "durationOptions": [
+      {
+        "label": "8 Hours",
+        "hours": 8,
+        "description": "Standard parking duration"
+      }
+    ]
+  },
+  "puregym-stafford": {
+    "siteId": "tveu8so7Vd7ETuosuuNw",
+    "siteName": "Eccleshall Retails",
+    "kioskName": "PureGym Stafford",
+    "kioskId": "",
+    "appLabel": "PureGym Stafford Kiosk",
+    "defaultHours": 3,
+    "expiryMode": "",
+    "reRegisterCooldownMinutes": 60,
+    "qrRefreshSeconds": 60,
+    "durationOptions": [
+      {
+        "label": "3 Hours",
+        "hours": 3,
+        "description": "Maximum stay"
+      }
+    ]
   },
   "stanier-square": {
     "siteId": "5mY9VkTQRAmhvdawzfDQ",
@@ -113,9 +153,115 @@
     "expiryMode": "",
     "reRegisterCooldownMinutes": 10,
     "durationOptions": [
-      { "label": "1 hr", "hours": 1, "description": "Short stay" },
-      { "label": "90 min", "hours": 1.5, "description": "Medium stay" },
-      { "label": "2 hrs", "hours": 2, "description": "Extended stay" }
+      {
+        "label": "1 hr",
+        "hours": 1,
+        "description": "Short stay"
+      },
+      {
+        "label": "90 min",
+        "hours": 1.5,
+        "description": "Medium stay"
+      },
+      {
+        "label": "2 hrs",
+        "hours": 2,
+        "description": "Extended stay"
+      }
+    ]
+  },
+  "barnaby-house": {
+    "siteId": "9JM9iGjI7ivrVi08sT2I",
+    "siteName": "Barnaby House",
+    "kioskName": "Barnaby House",
+    "kioskId": "",
+    "appLabel": "Barnaby House Kiosk",
+    "defaultHours": 24,
+    "expiryMode": "",
+    "reRegisterCooldownMinutes": 10,
+    "durationOptions": [
+      {
+        "code": "hours-24",
+        "hours": 24,
+        "permitType": "temporary",
+        "expiryMode": "",
+        "description": "Standard parking duration",
+        "label": "24 Hours"
+      }
+    ],
+    "staticQrDurationHours": 24
+  },
+  "pennyman-house": {
+    "siteId": "YKE9uX42zAh0OoEZpjVS",
+    "siteName": "Pennyman House",
+    "kioskName": "Pennyman House",
+    "kioskId": "",
+    "appLabel": "Pennyman House Kiosk",
+    "defaultHours": 2,
+    "expiryMode": "",
+    "reRegisterCooldownMinutes": 10,
+    "durationOptions": [
+      {
+        "label": "2 Hours",
+        "hours": 2,
+        "description": "Short stay"
+      },
+      {
+        "label": "8 Hours",
+        "hours": 8,
+        "description": "Extended stay"
+      }
+    ]
+  },
+  "glastonbury-house": {
+    "siteId": "VafqmKCfqpLjXjxV0Y2y",
+    "siteName": "Glastonbury House",
+    "kioskName": "Glastonbury House",
+    "kioskId": "",
+    "appLabel": "Glastonbury House Kiosk",
+    "defaultHours": 24,
+    "expiryMode": "",
+    "reRegisterCooldownMinutes": 10,
+    "durationOptions": [
+      {
+        "label": "24 Hours",
+        "hours": 24,
+        "description": "Full day permit"
+      }
+    ]
+  },
+  "studio-court": {
+    "siteId": "VFVjbmnFDyi9eU4C8uDT",
+    "siteName": "Studio Court",
+    "kioskName": "Studio Court",
+    "kioskId": "",
+    "appLabel": "Studio Court Kiosk",
+    "defaultHours": 8,
+    "expiryMode": "",
+    "reRegisterCooldownMinutes": 10,
+    "durationOptions": [
+      {
+        "label": "8 Hours",
+        "hours": 8,
+        "description": "Standard stay"
+      }
+    ]
+  },
+  "blackheath-newbridge-social-club": {
+    "siteId": "",
+    "siteName": "Blackheath Newbridge Social Club",
+    "kioskName": "Blackheath Newbridge Social Club",
+    "kioskId": "",
+    "appLabel": "Blackheath Newbridge Social Club Kiosk",
+    "defaultHours": 12,
+    "expiryMode": "",
+    "reRegisterCooldownMinutes": 10,
+    "durationOptions": [
+      {
+        "label": "12 Hours",
+        "hours": 12,
+        "description": "Standard parking duration"
+      }
     ]
   }
 }
