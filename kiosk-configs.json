@@ -303,5 +303,45 @@
         "label": "8 Hours"
       }
     ]
+  },
+  "hersham-social-club": {
+    "siteId": "MqXX6gRTHTPAFPbK7GnW",
+    "siteName": "Hersham Social Club",
+    "kioskName": "Hersham Social Club",
+    "kioskId": "EneTH5fPF7Pm8SddYOMT",
+    "appLabel": "Hersham Social Club Kiosk",
+    "defaultHours": null,
+    "expiryMode": "midnight",
+    "reRegisterCooldownMinutes": 10,
+    "durationOptions": [
+      {
+        "code": "midnight",
+        "hours": null,
+        "permitType": "temporary",
+        "expiryMode": "midnight",
+        "label": "Until Midnight",
+        "description": "Valid until 23:59 today"
+      }
+    ]
+  },
+  "west-end-social-club": {
+    "siteId": "18D48HHrT42tX6mL65K6",
+    "siteName": "West End Social Club",
+    "kioskName": "West End Social Club",
+    "kioskId": "4PbpdoLYfSUqayXw3yHT",
+    "appLabel": "West End Social Club Kiosk",
+    "defaultHours": null,
+    "expiryMode": "midnight",
+    "reRegisterCooldownMinutes": 10,
+    "durationOptions": [
+      {
+        "code": "midnight",
+        "hours": null,
+        "permitType": "temporary",
+        "expiryMode": "midnight",
+        "label": "Until Midnight",
+        "description": "Valid until 23:59 today"
+      }
+    ]
   }
 }
